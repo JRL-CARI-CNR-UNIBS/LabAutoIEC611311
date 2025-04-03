@@ -51,6 +51,9 @@ The program logic is organized around a **finite state machine (FSM)** to contro
 - `chirp.SignalOut`, `.SignalDot`, `.SignalDDot`: Command signals
 - `running`, `stopping`: Public flags for monitoring status
 
+
+### DUTs
+- `E_state` defined [here](../DUTs/ChirpTaskE_State.xml)
 ---
 
 ## 🧪 How It Works

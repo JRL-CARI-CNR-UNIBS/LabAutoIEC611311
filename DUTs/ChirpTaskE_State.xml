@@ -1,0 +1,67 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<project xmlns="http://www.plcopen.org/xml/tc6_0200">
+  <fileHeader companyName="Beckhoff Automation GmbH" productName="TwinCAT PLC Control" productVersion="3.5.13.21" creationDateTime="2025-04-03T13:53:02.3507151" />
+  <types>
+    <dataTypes>
+      <dataType name="E_State">
+        <baseType>
+          <enum>
+            <values>
+              <value name="None" />
+              <value name="Init" />
+              <value name="StartingMotor" />
+              <value name="OpeningFile" />
+              <value name="Chirp" />
+              <value name="Saving" />
+              <value name="SlowingDown" />
+              <value name="Stopping" />
+              <value name="DisableMotor" />
+            </values>
+          </enum>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
+            <Attributes>
+              <Attribute Name="qualified_only" Value="" />
+              <Attribute Name="strict" Value="" />
+            </Attributes>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/interfaceasplaintext" handleUnknown="implementation">
+            <InterfaceAsPlainText>
+              <xhtml xmlns="http://www.w3.org/1999/xhtml">{attribute 'qualified_only'}
+{attribute 'strict'}
+TYPE E_State :
+(
+	None,
+	Init,
+	StartingMotor,
+	OpeningFile,
+	Chirp,
+	Saving,
+	SlowingDown,
+	Stopping,
+	DisableMotor
+);
+END_TYPE
+</xhtml>
+            </InterfaceAsPlainText>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>a6dadeb0-de4a-4bbf-9467-24a4deb8eae2</ObjectId>
+          </data>
+        </addData>
+      </dataType>
+    </dataTypes>
+    <pous />
+  </types>
+  <instances>
+    <configurations />
+  </instances>
+  <addData>
+    <data name="http://www.3s-software.com/plcopenxml/projectstructure" handleUnknown="discard">
+      <ProjectStructure>
+        <Object Name="E_State" ObjectId="a6dadeb0-de4a-4bbf-9467-24a4deb8eae2" />
+      </ProjectStructure>
+    </data>
+  </addData>
+</project>

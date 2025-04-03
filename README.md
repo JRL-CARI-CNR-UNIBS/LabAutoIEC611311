@@ -8,18 +8,22 @@ This repository is maintained by the Robotics Joint Research Lab (JRL) between S
 ## 📁 Repository Structure
 
 - **[Programs](Programs/)**  
-  - `ChirpTest` – A complete motion experiment using chirp excitation and real-time logging.
+  - [`SimpleExampleMC2`](Programs/SimpleExampleMC2.md) – An illustrative example of the Tc2_MC2 Motion Control library
+  - [`ChirpTest`](Programs/ChirpTest.md) – A complete motion experiment using chirp excitation and real-time logging.
 
 - **[Function Blocks](Function%20Blocks/)**  
   - [`FB_ChirpSignal`](Function%20Blocks/FB_ChirpSignal.md) – Generates linear or logarithmic chirp trajectories with optional acceleration and velocity modes.
   - [`FB_DataLogger`](Function%20Blocks/FB_DataLogger.md) – Binary logger.
   
+- **[Derived User Types (DUTs)](DUTs/)**  
+  - [`E_State (ChirpTest)`](DUTs/ChirpTaskE_State.xml) – Enumerator used in `ChirpTest`.
+
 ---
 
 ## 🚀 Getting Started
 
 1. Clone or download the repository.
-2. Open TwinCAT 3 and import the desired `.xml` or `.exp` blocks.
+2. Open TwinCAT 3 and import the desired `.xml` blocks.
 3. Refer to each subfolder’s README for detailed usage instructions.
 
 ---
