@@ -133,7 +133,6 @@ torque = data(:,4);
 
 ```python
 import numpy as np
-import matplotlib.pyplot as plt
 
 # Load binary data file (adjust path as needed)
 filename = 'C:/Logs/experiment.bin'

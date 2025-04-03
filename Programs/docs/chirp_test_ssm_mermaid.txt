@@ -1,0 +1,12 @@
+stateDiagram-v2
+    [*] --> None
+    None --> Init : bStart
+    Init --> StartingMotor : asse1_power.Status AND asse1_power.Active
+    StartingMotor --> OpeningFile : fbExtSetPointEnable.Done AND asse1_setpos.Done
+    OpeningFile --> Chirp : NOT logger.bBusy
+    Chirp --> Saving : chirp.Done
+    Saving --> SlowingDown : NOT logger.bBusy
+    SlowingDown --> Stopping : idx > 2000 AND ABS(act_vel) ≤ 1.0
+    Stopping --> None : idx > 5000
+
+  x
