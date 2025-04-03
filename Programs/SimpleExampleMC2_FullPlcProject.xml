@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="Beckhoff Automation GmbH" productName="TwinCAT PLC Control" productVersion="3.5.13.21" creationDateTime="2025-04-03T14:50:56.4946492" />
-  <contentHeader name="MotionTest" modificationDateTime="2025-04-03T14:50:56.4946492">
+  <fileHeader companyName="Beckhoff Automation GmbH" productName="TwinCAT PLC Control" productVersion="3.5.13.21" creationDateTime="2025-04-03T15:08:22.0993641" />
+  <contentHeader name="MotionTest" modificationDateTime="2025-04-03T15:08:22.1023707">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -21,29 +21,97 @@
   </contentHeader>
   <types>
     <dataTypes />
-    <pous>
-      <pou name="MAIN" pouType="program">
-        <interface>
-          <localVars>
-            <variable name="Axis1">
-              <type>
-                <derived name="AXIS_REF" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml"> ======================================================================================
+    <pous />
+  </types>
+  <instances>
+    <configurations />
+  </instances>
+  <addData>
+    <data name="http://www.3s-software.com/plcopenxml/application" handleUnknown="implementation">
+      <resource name="MotionTest">
+        <task name="PlcTask" interval="PT0S" priority="20">
+          <pouInstance name="MAIN" typeName="">
+            <documentation>
+              <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+            </documentation>
+          </pouInstance>
+          <addData>
+            <data name="http://www.3s-software.com/plcopenxml/tasksettings" handleUnknown="implementation">
+              <TaskSettings KindOfTask="Cyclic" Interval="1000" IntervalUnit="us">
+                <Watchdog Enabled="false" TimeUnit="ms" />
+              </TaskSettings>
+            </data>
+            <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+              <ObjectId>943e3f10-f9f2-4fe2-aadb-d3dd1a4a92c1</ObjectId>
+            </data>
+          </addData>
+        </task>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/datatype" handleUnknown="implementation">
+            <dataType name="MotorState">
+              <baseType>
+                <enum>
+                  <values>
+                    <value name="NONE" />
+                    <value name="STARTING_MOTOR" />
+                    <value name="MOVE_TO_A" />
+                    <value name="MOVE_TO_B" />
+                    <value name="STOPPING_MOTOR" />
+                  </values>
+                </enum>
+              </baseType>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
+                  <Attributes>
+                    <Attribute Name="qualified_only" Value="" />
+                    <Attribute Name="strict" Value="" />
+                  </Attributes>
+                </data>
+                <data name="http://www.3s-software.com/plcopenxml/interfaceasplaintext" handleUnknown="implementation">
+                  <InterfaceAsPlainText>
+                    <xhtml xmlns="http://www.w3.org/1999/xhtml">{attribute 'qualified_only'}
+{attribute 'strict'}
+TYPE MotorState :
+(
+    NONE        ,
+    STARTING_MOTOR,
+    MOVE_TO_A     ,
+    MOVE_TO_B     ,
+    STOPPING_MOTOR
+);
+END_TYPE
+</xhtml>
+                  </InterfaceAsPlainText>
+                </data>
+                <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+                  <ObjectId>1015470d-bd4f-4d70-8974-b01d34e9eda1</ObjectId>
+                </data>
+              </addData>
+            </dataType>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/pou" handleUnknown="implementation">
+            <pou name="MAIN" pouType="program">
+              <interface>
+                <localVars>
+                  <variable name="Axis1">
+                    <type>
+                      <derived name="AXIS_REF" />
+                    </type>
+                    <documentation>
+                      <xhtml xmlns="http://www.w3.org/1999/xhtml"> ======================================================================================
  AXIS REFERENCE
  ======================================================================================
  `Axis1` is a symbolic reference to a motion axis configured in the TwinCAT I/O tree.
  It allows access to NC motion control parameters and feedback such as actual position,
  velocity, and torque. It is passed as a parameter to motion control function blocks.</xhtml>
-              </documentation>
-            </variable>
-            <variable name="fbPower">
-              <type>
-                <derived name="MC_Power" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml"> ======================================================================================
+                    </documentation>
+                  </variable>
+                  <variable name="fbPower">
+                    <type>
+                      <derived name="MC_Power" />
+                    </type>
+                    <documentation>
+                      <xhtml xmlns="http://www.w3.org/1999/xhtml"> ======================================================================================
  MOTION CONTROL FUNCTION BLOCKS
  ======================================================================================
  These blocks are part of the TwinCAT `Tc2_MC2` library and implement standard PLCopen
@@ -51,48 +119,48 @@
  they retain internal status across PLC cycles.
  `fbPower` is responsible for powering the axis ON and OFF. It handles safety checks and
  engages the drive when properly configured and commanded.</xhtml>
-              </documentation>
-            </variable>
-            <variable name="fbMoveA">
-              <type>
-                <derived name="MC_MoveAbsolute" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml"> `fbMoveA` performs an absolute positioning move to the user-defined position `posA`.
+                    </documentation>
+                  </variable>
+                  <variable name="fbMoveA">
+                    <type>
+                      <derived name="MC_MoveAbsolute" />
+                    </type>
+                    <documentation>
+                      <xhtml xmlns="http://www.w3.org/1999/xhtml"> `fbMoveA` performs an absolute positioning move to the user-defined position `posA`.
  It is only executed when the state machine requests it.</xhtml>
-              </documentation>
-            </variable>
-            <variable name="fbMoveB">
-              <type>
-                <derived name="MC_MoveAbsolute" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml"> `fbMoveB` performs a second absolute move to `posB`, typically returning the axis to
+                    </documentation>
+                  </variable>
+                  <variable name="fbMoveB">
+                    <type>
+                      <derived name="MC_MoveAbsolute" />
+                    </type>
+                    <documentation>
+                      <xhtml xmlns="http://www.w3.org/1999/xhtml"> `fbMoveB` performs a second absolute move to `posB`, typically returning the axis to
  its original or standby position.</xhtml>
-              </documentation>
-            </variable>
-            <variable name="state">
-              <type>
-                <derived name="MotorState" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml"> ======================================================================================
+                    </documentation>
+                  </variable>
+                  <variable name="state">
+                    <type>
+                      <derived name="MotorState" />
+                    </type>
+                    <documentation>
+                      <xhtml xmlns="http://www.w3.org/1999/xhtml"> ======================================================================================
  FSM STATE VARIABLE
  ======================================================================================
  `state` tracks the current execution state of the finite state machine (FSM).
  It is based on the `MotorState` enumeration type (declared in DUTs), which should
  define the possible states such as NONE, STARTING_MOTOR, MOVE_TO_A, etc.</xhtml>
-              </documentation>
-            </variable>
-            <variable name="posA">
-              <type>
-                <LREAL />
-              </type>
-              <initialValue>
-                <simpleValue value="100.0" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml"> ======================================================================================
+                    </documentation>
+                  </variable>
+                  <variable name="posA">
+                    <type>
+                      <LREAL />
+                    </type>
+                    <initialValue>
+                      <simpleValue value="100.0" />
+                    </initialValue>
+                    <documentation>
+                      <xhtml xmlns="http://www.w3.org/1999/xhtml"> ======================================================================================
  USER-DEFINED POSITION TARGETS
  ======================================================================================
  These are the absolute positions (in user units: e.g., mm or degrees) to which the axis
@@ -100,29 +168,29 @@
  profile or trajectory.
  `posA` is the first target point in the motion sequence. The axis will move to this
  position after the drive is powered on.</xhtml>
-              </documentation>
-            </variable>
-            <variable name="posB">
-              <type>
-                <LREAL />
-              </type>
-              <initialValue>
-                <simpleValue value="0.0" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml"> `posB` is the return or secondary position. The axis moves here after completing
+                    </documentation>
+                  </variable>
+                  <variable name="posB">
+                    <type>
+                      <LREAL />
+                    </type>
+                    <initialValue>
+                      <simpleValue value="0.0" />
+                    </initialValue>
+                    <documentation>
+                      <xhtml xmlns="http://www.w3.org/1999/xhtml"> `posB` is the return or secondary position. The axis moves here after completing
  the move to `posA`.</xhtml>
-              </documentation>
-            </variable>
-            <variable name="bStart" address="%I*">
-              <type>
-                <BOOL />
-              </type>
-              <initialValue>
-                <simpleValue value="FALSE" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml"> ======================================================================================
+                    </documentation>
+                  </variable>
+                  <variable name="bStart" address="%I*">
+                    <type>
+                      <BOOL />
+                    </type>
+                    <initialValue>
+                      <simpleValue value="FALSE" />
+                    </initialValue>
+                    <documentation>
+                      <xhtml xmlns="http://www.w3.org/1999/xhtml"> ======================================================================================
  DIGITAL I/O MAPPING
  ======================================================================================
  The following variables are directly mapped to physical or process image I/O.
@@ -136,39 +204,39 @@
  `bStart` is a Boolean variable that must be set externally (e.g., from an HMI, button,
  or test bench) to initiate the motion sequence. It acts as the FSM's entry condition.
  The logic inside the program will automatically reset it once used.</xhtml>
-              </documentation>
-            </variable>
-            <variable name="bMoving" address="%Q*">
-              <type>
-                <BOOL />
-              </type>
-              <initialValue>
-                <simpleValue value="FALSE" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml"> `bMoving` is mapped to `%Q*`, meaning it is a physical or process output variable.
+                    </documentation>
+                  </variable>
+                  <variable name="bMoving" address="%Q*">
+                    <type>
+                      <BOOL />
+                    </type>
+                    <initialValue>
+                      <simpleValue value="FALSE" />
+                    </initialValue>
+                    <documentation>
+                      <xhtml xmlns="http://www.w3.org/1999/xhtml"> `bMoving` is mapped to `%Q*`, meaning it is a physical or process output variable.
  It can be used to control an LED, HMI lamp, or any actuator to indicate that the axis
  is currently in motion.</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ActPos">
-              <type>
-                <LREAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml"> ======================================================================================
+                    </documentation>
+                  </variable>
+                  <variable name="ActPos">
+                    <type>
+                      <LREAL />
+                    </type>
+                    <documentation>
+                      <xhtml xmlns="http://www.w3.org/1999/xhtml"> ======================================================================================
  AXIS FEEDBACK MONITORING
  ======================================================================================
  `ActPos` stores the actual position of the axis (`Axis1.NcToPlc.ActPos`).
  This variable is updated cyclically and can be used for diagnostics, logging, visualization,
  or condition-based decision making.</xhtml>
-              </documentation>
-            </variable>
-          </localVars>
-        </interface>
-        <body>
-          <ST>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">// ==========================================================================================
+                    </documentation>
+                  </variable>
+                </localVars>
+              </interface>
+              <body>
+                <ST>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">// ==========================================================================================
 // === AXIS FEEDBACK ACQUISITION ===
 // ==========================================================================================
 //
@@ -321,12 +389,12 @@ CASE state OF
 
 END_CASE
 </xhtml>
-          </ST>
-        </body>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/interfaceasplaintext" handleUnknown="implementation">
-            <InterfaceAsPlainText>
-              <xhtml xmlns="http://www.w3.org/1999/xhtml">PROGRAM MAIN
+                </ST>
+              </body>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/interfaceasplaintext" handleUnknown="implementation">
+                  <InterfaceAsPlainText>
+                    <xhtml xmlns="http://www.w3.org/1999/xhtml">PROGRAM MAIN
 VAR
     // ======================================================================================
     // AXIS REFERENCE
@@ -412,22 +480,54 @@ VAR
     ActPos : LREAL;
 END_VAR
 </xhtml>
-            </InterfaceAsPlainText>
+                  </InterfaceAsPlainText>
+                </data>
+                <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+                  <ObjectId>471c3160-c8be-4dfe-94ec-6dc16844d595</ObjectId>
+                </data>
+              </addData>
+            </pou>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/libraries" handleUnknown="implementation">
+            <Libraries>
+              <Library Name="#Tc2_MC2" Namespace="Tc2_MC2" HideWhenReferencedAsDependency="false" PublishSymbolsInContainer="false" SystemLibrary="false" LinkAllContent="false" DefaultResolution="Tc2_MC2, * (Beckhoff Automation GmbH)" />
+              <Library Name="#Tc2_Standard" Namespace="Tc2_Standard" HideWhenReferencedAsDependency="false" PublishSymbolsInContainer="false" SystemLibrary="false" LinkAllContent="false" DefaultResolution="Tc2_Standard, * (Beckhoff Automation GmbH)" />
+              <Library Name="#Tc2_System" Namespace="Tc2_System" HideWhenReferencedAsDependency="false" PublishSymbolsInContainer="false" SystemLibrary="false" LinkAllContent="false" DefaultResolution="Tc2_System, * (Beckhoff Automation GmbH)">
+                <Parameters>
+                  <Parameter Name="PARAM.TABLE_UPPER_BOUND" Value="15" />
+                  <Parameter Name="PARAM.STRING_LENGTH_EXP" Value="255" />
+                  <Parameter Name="PARAM.STRING_LENGTH_ADDRESS" Value="20" />
+                  <Parameter Name="PARAM.STRING_LENGTH_COMMENT" Value="255" />
+                  <Parameter Name="PARAM.STRING_LENGTH_OUTSTRING" Value="255" />
+                  <Parameter Name="PARAM.TABLE_SHOW_VALID_ITEMS" Value="FALSE" />
+                </Parameters>
+              </Library>
+              <Library Name="#Tc3_Module" Namespace="Tc3_Module" HideWhenReferencedAsDependency="false" PublishSymbolsInContainer="false" SystemLibrary="false" LinkAllContent="false" DefaultResolution="Tc3_Module, * (Beckhoff Automation GmbH)" />
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+                  <ObjectId>e48d9bc3-adc7-4bd3-830d-f743ad48dc16</ObjectId>
+                </data>
+              </addData>
+            </Libraries>
           </data>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>471c3160-c8be-4dfe-94ec-6dc16844d595</ObjectId>
+            <ObjectId>3d2b2ca5-267f-486c-a108-b6d143a912bc</ObjectId>
           </data>
         </addData>
-      </pou>
-    </pous>
-  </types>
-  <instances>
-    <configurations />
-  </instances>
-  <addData>
+      </resource>
+    </data>
     <data name="http://www.3s-software.com/plcopenxml/projectstructure" handleUnknown="discard">
       <ProjectStructure>
-        <Object Name="MAIN" ObjectId="471c3160-c8be-4dfe-94ec-6dc16844d595" />
+        <Object Name="MotionTest" ObjectId="3d2b2ca5-267f-486c-a108-b6d143a912bc">
+          <Object Name="Library Manager" ObjectId="e48d9bc3-adc7-4bd3-830d-f743ad48dc16" />
+          <Folder Name="DUTs">
+            <Object Name="MotorState" ObjectId="1015470d-bd4f-4d70-8974-b01d34e9eda1" />
+          </Folder>
+          <Object Name="PlcTask" ObjectId="943e3f10-f9f2-4fe2-aadb-d3dd1a4a92c1" />
+          <Folder Name="POUs">
+            <Object Name="MAIN" ObjectId="471c3160-c8be-4dfe-94ec-6dc16844d595" />
+          </Folder>
+        </Object>
       </ProjectStructure>
     </data>
   </addData>

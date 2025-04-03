@@ -1,0 +1,1689 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<project xmlns="http://www.plcopen.org/xml/tc6_0200">
+  <fileHeader companyName="Beckhoff Automation GmbH" productName="TwinCAT PLC Control" productVersion="3.5.13.21" creationDateTime="2025-04-03T15:09:53.3470905" />
+  <contentHeader name="ChirpTest" modificationDateTime="2025-04-03T15:09:53.3470905">
+    <coordinateInfo>
+      <fbd>
+        <scaling x="1" y="1" />
+      </fbd>
+      <ld>
+        <scaling x="1" y="1" />
+      </ld>
+      <sfc>
+        <scaling x="1" y="1" />
+      </sfc>
+    </coordinateInfo>
+    <addData>
+      <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
+        <ProjectInformation />
+      </data>
+    </addData>
+  </contentHeader>
+  <types>
+    <dataTypes />
+    <pous />
+  </types>
+  <instances>
+    <configurations />
+  </instances>
+  <addData>
+    <data name="http://www.3s-software.com/plcopenxml/application" handleUnknown="implementation">
+      <resource name="ChirpTest">
+        <task name="PlcTask" interval="PT0S" priority="6">
+          <pouInstance name="ChirpTest" typeName="">
+            <documentation>
+              <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+            </documentation>
+          </pouInstance>
+          <addData>
+            <data name="http://www.3s-software.com/plcopenxml/tasksettings" handleUnknown="implementation">
+              <TaskSettings KindOfTask="Cyclic" Interval="1000" IntervalUnit="us">
+                <Watchdog Enabled="false" TimeUnit="ms" />
+              </TaskSettings>
+            </data>
+            <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+              <ObjectId>fc14ddeb-4478-4c88-835f-7fdc97c6d7f4</ObjectId>
+            </data>
+          </addData>
+        </task>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/datatype" handleUnknown="implementation">
+            <dataType name="E_State">
+              <baseType>
+                <enum>
+                  <values>
+                    <value name="None" />
+                    <value name="Init" />
+                    <value name="StartingMotor" />
+                    <value name="OpeningFile" />
+                    <value name="Chirp" />
+                    <value name="Saving" />
+                    <value name="SlowingDown" />
+                    <value name="Stopping" />
+                    <value name="DisableMotor" />
+                  </values>
+                </enum>
+              </baseType>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
+                  <Attributes>
+                    <Attribute Name="qualified_only" Value="" />
+                    <Attribute Name="strict" Value="" />
+                  </Attributes>
+                </data>
+                <data name="http://www.3s-software.com/plcopenxml/interfaceasplaintext" handleUnknown="implementation">
+                  <InterfaceAsPlainText>
+                    <xhtml xmlns="http://www.w3.org/1999/xhtml">{attribute 'qualified_only'}
+{attribute 'strict'}
+TYPE E_State :
+(
+	None,
+	Init,
+	StartingMotor,
+	OpeningFile,
+	Chirp,
+	Saving,
+	SlowingDown,
+	Stopping,
+	DisableMotor
+);
+END_TYPE
+</xhtml>
+                  </InterfaceAsPlainText>
+                </data>
+                <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+                  <ObjectId>a6dadeb0-de4a-4bbf-9467-24a4deb8eae2</ObjectId>
+                </data>
+              </addData>
+            </dataType>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/pou" handleUnknown="implementation">
+            <pou name="ChirpTest" pouType="program">
+              <interface>
+                <localVars>
+                  <variable name="asse1">
+                    <type>
+                      <derived name="AXIS_REF" />
+                    </type>
+                    <documentation>
+                      <xhtml xmlns="http://www.w3.org/1999/xhtml"> Axis reference and motion control blocks</xhtml>
+                    </documentation>
+                  </variable>
+                  <variable name="asse1_power">
+                    <type>
+                      <derived name="MC_Power" />
+                    </type>
+                  </variable>
+                  <variable name="asse1_setpos">
+                    <type>
+                      <derived name="MC_SetPosition" />
+                    </type>
+                  </variable>
+                  <variable name="bStart" address="%I*">
+                    <type>
+                      <BOOL />
+                    </type>
+                    <documentation>
+                      <xhtml xmlns="http://www.w3.org/1999/xhtml"> Start trigger for the chirp experiment (external input)</xhtml>
+                    </documentation>
+                  </variable>
+                  <variable name="fbExtSetPointEnable">
+                    <type>
+                      <derived name="MC_ExtSetPointGenEnable" />
+                    </type>
+                    <documentation>
+                      <xhtml xmlns="http://www.w3.org/1999/xhtml"> Enables external setpoint generation for the axis</xhtml>
+                    </documentation>
+                  </variable>
+                  <variable name="fbExtSetPointDisable">
+                    <type>
+                      <derived name="MC_ExtSetPointGenDisable" />
+                    </type>
+                    <documentation>
+                      <xhtml xmlns="http://www.w3.org/1999/xhtml"> Disables external setpoint generation</xhtml>
+                    </documentation>
+                  </variable>
+                  <variable name="Tc">
+                    <type>
+                      <LREAL />
+                    </type>
+                    <initialValue>
+                      <simpleValue value="0.001" />
+                    </initialValue>
+                    <documentation>
+                      <xhtml xmlns="http://www.w3.org/1999/xhtml"> Sampling time (in seconds), default 1 ms</xhtml>
+                    </documentation>
+                  </variable>
+                  <variable name="amplitude">
+                    <type>
+                      <LREAL />
+                    </type>
+                    <initialValue>
+                      <simpleValue value="360" />
+                    </initialValue>
+                    <documentation>
+                      <xhtml xmlns="http://www.w3.org/1999/xhtml"> Amplitude of the chirp signal in engineering units (e.g., degrees or mm)</xhtml>
+                    </documentation>
+                  </variable>
+                  <variable name="acc">
+                    <type>
+                      <LREAL />
+                    </type>
+                    <initialValue>
+                      <simpleValue value="0.0" />
+                    </initialValue>
+                    <documentation>
+                      <xhtml xmlns="http://www.w3.org/1999/xhtml"> Output acceleration from the chirp generator</xhtml>
+                    </documentation>
+                  </variable>
+                  <variable name="vel">
+                    <type>
+                      <LREAL />
+                    </type>
+                    <initialValue>
+                      <simpleValue value="100.0" />
+                    </initialValue>
+                    <documentation>
+                      <xhtml xmlns="http://www.w3.org/1999/xhtml"> Output velocity from the chirp generator</xhtml>
+                    </documentation>
+                  </variable>
+                  <variable name="pos">
+                    <type>
+                      <LREAL />
+                    </type>
+                    <initialValue>
+                      <simpleValue value="0.0" />
+                    </initialValue>
+                    <documentation>
+                      <xhtml xmlns="http://www.w3.org/1999/xhtml"> Output position from the chirp generator</xhtml>
+                    </documentation>
+                  </variable>
+                  <variable name="dir">
+                    <type>
+                      <DINT />
+                    </type>
+                    <initialValue>
+                      <simpleValue value="0" />
+                    </initialValue>
+                    <documentation>
+                      <xhtml xmlns="http://www.w3.org/1999/xhtml"> Direction: 1 = forward, -1 = backward, 0 = stopped</xhtml>
+                    </documentation>
+                  </variable>
+                  <variable name="f0">
+                    <type>
+                      <LREAL />
+                    </type>
+                    <initialValue>
+                      <simpleValue value="1.0" />
+                    </initialValue>
+                    <documentation>
+                      <xhtml xmlns="http://www.w3.org/1999/xhtml"> Starting frequency of the chirp signal (Hz)</xhtml>
+                    </documentation>
+                  </variable>
+                  <variable name="f1">
+                    <type>
+                      <LREAL />
+                    </type>
+                    <initialValue>
+                      <simpleValue value="450.0" />
+                    </initialValue>
+                    <documentation>
+                      <xhtml xmlns="http://www.w3.org/1999/xhtml"> Final frequency of the chirp signal (Hz)</xhtml>
+                    </documentation>
+                  </variable>
+                  <variable name="duration">
+                    <type>
+                      <LREAL />
+                    </type>
+                    <initialValue>
+                      <simpleValue value="60.0" />
+                    </initialValue>
+                    <documentation>
+                      <xhtml xmlns="http://www.w3.org/1999/xhtml"> Duration of the chirp signal (seconds)</xhtml>
+                    </documentation>
+                  </variable>
+                  <variable name="UseLog" address="%I*">
+                    <type>
+                      <BOOL />
+                    </type>
+                    <documentation>
+                      <xhtml xmlns="http://www.w3.org/1999/xhtml"> TRUE for logarithmic chirp; FALSE for linear chirp</xhtml>
+                    </documentation>
+                  </variable>
+                  <variable name="running" address="%Q*">
+                    <type>
+                      <BOOL />
+                    </type>
+                    <documentation>
+                      <xhtml xmlns="http://www.w3.org/1999/xhtml"> TRUE when experiment is in Chirp state</xhtml>
+                    </documentation>
+                  </variable>
+                  <variable name="stopping" address="%Q*">
+                    <type>
+                      <BOOL />
+                    </type>
+                    <documentation>
+                      <xhtml xmlns="http://www.w3.org/1999/xhtml"> TRUE during final deceleration and stop phases</xhtml>
+                    </documentation>
+                  </variable>
+                  <variable name="chirp">
+                    <type>
+                      <derived name="FB_ChirpSignal" />
+                    </type>
+                    <documentation>
+                      <xhtml xmlns="http://www.w3.org/1999/xhtml"> Chirp signal generator function block instance</xhtml>
+                    </documentation>
+                  </variable>
+                  <variable name="act_pos">
+                    <type>
+                      <LREAL />
+                    </type>
+                    <documentation>
+                      <xhtml xmlns="http://www.w3.org/1999/xhtml"> Actual position from the axis</xhtml>
+                    </documentation>
+                  </variable>
+                  <variable name="act_vel">
+                    <type>
+                      <LREAL />
+                    </type>
+                    <documentation>
+                      <xhtml xmlns="http://www.w3.org/1999/xhtml"> Actual velocity from the axis</xhtml>
+                    </documentation>
+                  </variable>
+                  <variable name="act_torque">
+                    <type>
+                      <LREAL />
+                    </type>
+                    <documentation>
+                      <xhtml xmlns="http://www.w3.org/1999/xhtml"> Actual torque from the axis</xhtml>
+                    </documentation>
+                  </variable>
+                  <variable name="first_position">
+                    <type>
+                      <LREAL />
+                    </type>
+                    <documentation>
+                      <xhtml xmlns="http://www.w3.org/1999/xhtml"> Position at the start of the chirp experiment</xhtml>
+                    </documentation>
+                  </variable>
+                  <variable name="logger">
+                    <type>
+                      <derived name="FB_DataLogger" />
+                    </type>
+                    <documentation>
+                      <xhtml xmlns="http://www.w3.org/1999/xhtml"> File logging function block instance</xhtml>
+                    </documentation>
+                  </variable>
+                  <variable name="state">
+                    <type>
+                      <derived name="E_State" />
+                    </type>
+                    <initialValue>
+                      <simpleValue value="E_State.None" />
+                    </initialValue>
+                    <documentation>
+                      <xhtml xmlns="http://www.w3.org/1999/xhtml"> Current state of the finite state machine</xhtml>
+                    </documentation>
+                  </variable>
+                  <variable name="sFileName">
+                    <type>
+                      <derived name="T_MaxString" />
+                    </type>
+                    <initialValue>
+                      <simpleValue value="'C:\Users\Administrator\Documents\binari\test1.bin'" />
+                    </initialValue>
+                    <documentation>
+                      <xhtml xmlns="http://www.w3.org/1999/xhtml"> Binary file path</xhtml>
+                    </documentation>
+                  </variable>
+                  <variable name="netId">
+                    <type>
+                      <derived name="T_AmsNetId" />
+                    </type>
+                    <documentation>
+                      <xhtml xmlns="http://www.w3.org/1999/xhtml"> Network ID for TwinCAT file functions</xhtml>
+                    </documentation>
+                  </variable>
+                  <variable name="nTaskIdx">
+                    <type>
+                      <DINT />
+                    </type>
+                    <documentation>
+                      <xhtml xmlns="http://www.w3.org/1999/xhtml"> Index of the running task</xhtml>
+                    </documentation>
+                  </variable>
+                  <variable name="tmp">
+                    <type>
+                      <LREAL />
+                    </type>
+                    <documentation>
+                      <xhtml xmlns="http://www.w3.org/1999/xhtml"> Temporary variable</xhtml>
+                    </documentation>
+                  </variable>
+                  <variable name="idx">
+                    <type>
+                      <INT />
+                    </type>
+                    <documentation>
+                      <xhtml xmlns="http://www.w3.org/1999/xhtml"> Generic counter for delay loops</xhtml>
+                    </documentation>
+                  </variable>
+                  <variable name="last_position">
+                    <type>
+                      <LREAL />
+                    </type>
+                    <documentation>
+                      <xhtml xmlns="http://www.w3.org/1999/xhtml"> Position after chirp completion</xhtml>
+                    </documentation>
+                  </variable>
+                  <variable name="slowing_down_vel">
+                    <type>
+                      <LREAL />
+                    </type>
+                    <documentation>
+                      <xhtml xmlns="http://www.w3.org/1999/xhtml"> Velocity captured before slowing down</xhtml>
+                    </documentation>
+                  </variable>
+                </localVars>
+              </interface>
+              <body>
+                <ST>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">(*
+===============================================================================
+Chirp Experiment – TwinCAT Axis Control with Logging and Signal Injection
+===============================================================================
+
+This program implements a fully automated **chirp-based excitation experiment**
+on a single motion axis in TwinCAT. The control flow is managed through a clearly
+defined **finite state machine (FSM)**, which handles axis setup, signal injection,
+data logging, and safe deceleration and shutdown.
+
+The goal is to apply a **chirp signal**—a frequency-swept input—to the axis as an
+external setpoint, allowing dynamic system response analysis. While doing so,
+important motion feedback signals (position, velocity, torque) are recorded in a
+binary file for post-processing.
+
+The experiment is composed of the following key phases:
+
+------------------------------------------------------------------------------
+🧭 STATE MACHINE BEHAVIOR
+------------------------------------------------------------------------------
+
+🔹 `E_State.None` – **Idle / Standby**
+- The initial state of the system.
+- Waits for the external trigger `bStart` to become TRUE.
+- Reads the PLC task’s cycle time to determine `Tc`, the sampling interval.
+- This ensures the chirp generator is precisely synchronized with the task.
+
+🔹 `E_State.Init` – **Axis Power-On**
+- Commands the axis to enable using the standard `MC_Power` block.
+- Waits until the drive signals it is ready (`Active = TRUE`).
+- Once ready, transitions to the motor start state.
+
+🔹 `E_State.StartingMotor` – **Prepare for Motion**
+- Resets the axis position to zero using `MC_SetPosition`.
+- Activates external setpoint mode via `MC_ExtSetPointGenEnable`.
+- Configures the `FB_ChirpSignal` with frequency range, duration, and amplitude.
+- Opens the data log file with `FB_DataLogger`, ready to store measurements.
+- Transitions to the file-open wait state.
+
+🔹 `E_State.OpeningFile` – **Wait for File Ready**
+- Waits until the logger is not busy (`bBusy = FALSE`), meaning the file is open.
+- Captures the axis position as the reference for chirp-relative motion.
+- Proceeds to the active chirp signal execution phase.
+
+🔹 `E_State.Chirp` – **Chirp Signal Execution**
+- Calls the chirp function block cyclically to generate position, velocity, and
+  acceleration commands as a function of time.
+- Commands the axis in real-time using `MC_ExtSetPointGenFeed` with the chirp output.
+- Continuously logs axis feedback data into the binary file.
+- When `chirp.Done` becomes TRUE, indicating the signal has run its course,
+  the system transitions to file closing.
+
+🔹 `E_State.Saving` – **Close File**
+- Sends a one-shot trigger to `FB_DataLogger` to close the binary file.
+- Captures the last position and velocity at the end of chirp execution.
+- Disables external setpoint mode to transition safely out of real-time control.
+- Moves into a controlled deceleration phase.
+
+🔹 `E_State.SlowingDown` – **Monitor Deceleration**
+- Allows the axis to naturally slow down after external setpoint disengagement.
+- Waits either until a velocity threshold is reached (e.g., below 1.0 units/s)
+  or until a counter exceeds 2000 cycles (as a timeout failsafe).
+- Ensures `MC_ExtSetPointGenDisable` is re-asserted.
+- Once conditions are met, moves to axis shutdown.
+
+🔹 `E_State.Stopping` – **Stop and Power-Off**
+- Provides a timed delay (~5000 cycles) before safely powering off the axis.
+- Ensures full stop before sending `MC_Power` with `Enable := FALSE`.
+- Resets internal state and returns to `None` (idle), ready for the next cycle.
+
+------------------------------------------------------------------------------
+📘 ADDITIONAL DETAILS
+------------------------------------------------------------------------------
+
+- **Setpoint Feeding**:
+  - Position, velocity, and acceleration commands are passed via `MC_ExtSetPointGenFeed`.
+  - The signal can be either linear or logarithmic based on `UseLog`.
+
+- **Signal Direction**:
+  - Direction (`dir`) is computed from the sign of the velocity output to guide motion.
+
+- **Binary Logging**:
+  - Values logged: `chirp.t`, `act_pos`, `act_vel`, and `act_torque`.
+  - Format: `ARRAY[1..4] OF LREAL` written using `FB_DataLogger`.
+
+- **Task Syncing**:
+  - The sampling time `Tc` is derived dynamically using `GETCURTASKINDEXEX()`, ensuring the chirp signal and logger stay synchronized with the PLC task.
+
+- **Diagnostics**:
+  - `running` and `stopping` flags are exposed as output variables to reflect experiment status.
+  - Useful for UI binding or test monitoring.
+
+This structure allows precise, automated execution of a dynamic excitation experiment with data capture and safe system shutdown, fully integrated in the TwinCAT runtime environment.
+
+===============================================================================
+*)
+
+// === Always keep axis status updated ===
+// This call ensures that the axis reference structure (asse1) is refreshed 
+// with the most recent state, including position, velocity, and torque.
+// It is important for correct control logic and safe feedback reading.
+asse1.ReadStatus();
+
+(*
+===============================================================================
+STATE MACHINE: Main Flow Logic
+===============================================================================
+
+This block defines the transitions between high-level states in the chirp 
+experiment. The FSM ensures the experiment is initialized, executed, and 
+terminated in a controlled, deterministic sequence.
+*)
+
+CASE state OF
+
+	// --- STATE: Idle / Waiting ---
+	E_State.None:
+		// Wait for external trigger (`bStart`) to begin experiment
+		// This is the system's resting state, entered after power-on or completion
+		IF bStart THEN
+			state := E_State.Init;
+		END_IF
+
+	// --- STATE: Powering the Axis ---
+	E_State.Init:
+		// Wait for `MC_Power` block to indicate axis is fully enabled and active
+		// Ensures the drive is ready to receive motion commands
+		IF asse1_power.Status AND asse1_power.Active THEN
+			state := E_State.StartingMotor;
+		END_IF
+
+	// --- STATE: Preparing Axis and Chirp ---
+	E_State.StartingMotor:
+		// Wait until both the set position and external setpoint generation are complete
+		// These confirm the motion system is configured correctly
+		IF fbExtSetPointEnable.Done AND asse1_setpos.Done THEN
+			state := E_State.OpeningFile;
+
+			// Optionally capture the current position (useful for diagnostics)
+			tmp := asse1.NcToPlc.ActPos;
+		END_IF
+
+	// --- STATE: Waiting for File Open Completion ---
+	E_State.OpeningFile:
+		// Wait until the logger finishes opening the binary file
+		// This prevents logging attempts before the file handle is ready
+		IF NOT logger.bBusy THEN
+			// Save the axis position at the start of the experiment.
+			// Used as a reference offset for the chirp signal
+			first_position := asse1.NcToPlc.ActPos;
+
+			// Begin the actual chirp generation phase
+			state := E_State.Chirp;
+		END_IF
+
+	// --- STATE: Running the Chirp Signal and Logging ---
+	E_State.Chirp:
+		// This state will remain active while the chirp generator runs
+		// Transition only when chirp is complete
+		IF chirp.Done THEN
+			state := E_State.Saving;
+		END_IF
+
+	// --- STATE: Closing Log File After Chirp ---
+	E_State.Saving:
+		// Wait until file logger finishes closing the file
+		// Guarantees all data is flushed and saved correctly
+		IF NOT logger.bBusy THEN
+			// Store final values for reporting or safety
+			last_position := asse1.NcToPlc.ActPos;
+			slowing_down_vel := asse1.NcToPlc.ActVelo;
+
+			// Move into deceleration and stopping phase
+			state := E_State.SlowingDown;
+			idx := 0; // Initialize counter used as timeout
+
+			// Explicitly disable external setpoint generation
+			// Prevents further feedforward commands after chirp ends
+			fbExtSetPointEnable(
+				Axis := asse1,
+				Execute := FALSE,
+				PositionType := POSITIONTYPE_ABSOLUTE
+			);
+			fbExtSetPointDisable(
+				Axis := asse1,
+				Execute := TRUE
+			);
+		END_IF
+
+	// --- STATE: Monitoring Deceleration ---
+	E_State.SlowingDown:
+		// Allow the system to coast down or naturally stop
+		// Either velocity must fall below threshold or a delay elapses
+
+		// Condition A: Wait long enough (~2000 cycles) before proceeding
+		IF idx &gt; 2000 THEN
+			// Redundantly ensure external setpoint is fully disabled
+			// (sometimes needed for specific drive implementations)
+			fbExtSetPointEnable(
+				Axis := asse1,
+				Execute := FALSE,
+				PositionType := POSITIONTYPE_ABSOLUTE
+			);
+			fbExtSetPointDisable(
+				Axis := asse1,
+				Execute := TRUE
+			);
+
+			idx := 0;
+			state := E_State.Stopping;
+
+		// Condition B: If velocity is still high, keep waiting and reset counter
+		ELSIF ABS(act_vel) &gt; 1.0 THEN 
+			idx := 0;
+		END_IF
+
+	// --- STATE: Power-Off and Reset ---
+	E_State.Stopping:
+		// Provide a buffer time (~5000 cycles) to ensure the system is stable
+		// before removing drive power
+		IF idx &gt; 5000 THEN
+			// Fully disable drive power for safety and completeness
+			asse1_power(
+				Axis := asse1,
+				Enable := FALSE,
+				Enable_Positive := FALSE,
+				Enable_Negative := FALSE
+			);
+
+			idx := 0;
+			state := E_State.None; // Return to idle and ready for new run
+		END_IF
+END_CASE
+
+// --- External flags for UI/debugging ---
+running := state = E_State.Chirp;         // TRUE during chirp execution
+stopping := state &gt; E_State.Chirp;        // TRUE from chirp end to axis power-off
+
+(*
+===============================================================================
+EVENT LOGIC: Actions Tied to Each State
+===============================================================================
+
+This section defines the **operations that occur** while the system is *in* each state.
+Unlike the FSM transition logic (which determines when to switch states), this part
+executes behaviors appropriate to the current state, including power commands, 
+signal generation, logging, and setpoint feed-forwarding.
+
+Each block is evaluated cyclically, and actions are either conditionally or 
+continuously performed based on the state.
+*)
+
+CASE state OF
+
+	// --- STATE: None (Idle) ---
+	E_State.None:
+		// Determine the index of the current cyclic task
+		// This is used to access task metadata such as the cycle time
+		nTaskIdx := GETCURTASKINDEXEX();
+
+		// Compute the task period `Tc` in seconds
+		// 100 ns is the base resolution unit; convert it to seconds via multiplication
+		Tc := 100.0E-9 * TO_LREAL(_TaskInfo[nTaskIdx].CycleTime);
+
+		// No other actions required in idle state
+
+	// --- STATE: Init (Power the Axis) ---
+	E_State.Init:
+		// Issue command to enable axis power in all directions
+		// The command will stay active until the axis confirms it is powered (handled in transition logic)
+		asse1_power(
+			Axis := asse1,
+			Enable := TRUE,
+			Enable_Positive := TRUE,
+			Enable_Negative := TRUE
+		);
+
+		// Reset the external start signal so it doesn’t retrigger the experiment
+		bStart := FALSE;
+
+	// --- STATE: StartingMotor (Configure Axis and Chirp) ---
+	E_State.StartingMotor:
+		// Send command to reset axis position to 0.0 (homing substitute)
+		asse1_setpos(
+			Axis := asse1,
+			Execute := TRUE,
+			Position := 0.0
+		);
+
+		// Enable external setpoint mode (required to command motion using generated trajectories)
+		fbExtSetPointEnable(
+			Axis := asse1,
+			Execute := TRUE,
+			PositionType := POSITIONTYPE_ABSOLUTE
+		);
+
+		// Make sure the disable command is not active simultaneously
+		fbExtSetPointDisable(
+			Axis := asse1,
+			Execute := FALSE
+		);
+
+		// Initialize the chirp signal generator
+		chirp.Amplitude := amplitude;       // Peak signal value
+		chirp.FreqStart := f0;              // Initial frequency (Hz)
+		chirp.FreqEnd := f1;                // Final frequency (Hz)
+		chirp.Duration := duration;         // Total duration of signal (s)
+		chirp.Ts := Tc;                     // Sampling time (s)
+		chirp.UseLog := UseLog;             // Use logarithmic or linear chirp
+		chirp.Reset := TRUE;                // Force reset of internal states
+		chirp.Start := FALSE;               // Don’t begin signal yet
+		chirp();                            // Execute one cycle to apply reset
+
+		// Open file for logging using FB_DataLogger
+		// This prepares the binary file for real-time write access
+		logger(
+			netId := netId,
+			sFileName := sFileName,
+			bOpen := TRUE,
+			bWrite := FALSE,
+			bClose := FALSE
+		);
+
+	// --- STATE: OpeningFile (Poll Logger Status) ---
+	E_State.OpeningFile:
+		// Keep the logger running with no new triggers while waiting for the file to open
+		// Required because TwinCAT file function blocks are edge-triggered
+		logger(
+			netId := netId,
+			sFileName := sFileName,
+			bOpen := FALSE,
+			bWrite := FALSE,
+			bClose := FALSE
+		);
+
+	// --- STATE: Chirp (Generate and Feed Setpoints + Logging) ---
+	E_State.Chirp:
+		// Execute chirp function block
+		// It will output a sinusoidal signal whose frequency increases over time
+		chirp(
+			Start := TRUE,
+			Reset := FALSE
+		);
+
+		// Read real-time feedback from the axis (actual state)
+		act_pos := asse1.NcToPlc.ActPos;
+		act_vel := asse1.NcToPlc.ActVelo;
+		act_torque := asse1.NcToPlc.ActTorque;
+
+		// Compute new target position relative to the start
+		pos := first_position + chirp.SignalOut;
+
+		// Extract target velocity and acceleration from chirp signal
+		vel := chirp.SignalDot;
+		acc := chirp.SignalDDot;
+
+		// Compute direction: required by MC_ExtSetPointGenFeed
+		// Helps motion control logic determine the axis movement orientation
+		IF (vel &gt; 0) THEN
+			dir := 1;
+		ELSIF (vel &lt; 0) THEN
+			dir := -1;
+		ELSE
+			dir := 0;
+		END_IF
+
+		// Send external setpoint commands to the axis
+		// This bypasses normal PLCopen motion blocks and directly controls position, velocity, acceleration
+		MC_ExtSetPointGenFeed(
+			Axis := asse1,
+			Position := pos,
+			Velocity := vel,
+			Acceleration := acc,
+			Direction := dir
+		);
+
+		// Log data to file in real-time
+		// Each sample includes:
+		//   - Current chirp time (t)
+		//   - Actual position
+		//   - Actual velocity
+		//   - Actual torque
+		logger(
+			t := chirp.t,
+			act_pos := act_pos,
+			act_vel := act_vel,
+			act_torque := act_torque,
+			bOpen := FALSE,
+			bWrite := TRUE,
+			bClose := FALSE
+		);
+
+	// --- STATE: Saving (Close File) ---
+	E_State.Saving:
+		// Trigger logger to close the binary file once the chirp is finished
+		// This ensures all buffered data is saved to disk
+		logger(
+			bOpen := FALSE,
+			bWrite := FALSE,
+			bClose := TRUE
+		);
+
+	// --- STATE: SlowingDown (Monitor Velocity and Wait) ---
+	E_State.SlowingDown:
+		// Increment internal delay counter (used as timeout)
+		idx := idx + 1;
+
+		// Continue monitoring axis feedback during deceleration
+		act_pos := asse1.NcToPlc.ActPos;
+		act_vel := asse1.NcToPlc.ActVelo;
+
+	// --- STATE: Stopping (Timeout Before Power-Off) ---
+	E_State.Stopping:
+		// Let system rest before fully disabling drive power
+		// This ensures that all operations are complete and that no active motion remains
+		idx := idx + 1;
+
+END_CASE
+</xhtml>
+                </ST>
+              </body>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/interfaceasplaintext" handleUnknown="implementation">
+                  <InterfaceAsPlainText>
+                    <xhtml xmlns="http://www.w3.org/1999/xhtml">PROGRAM ChirpTest
+VAR
+	// Axis reference and motion control blocks
+	asse1: AXIS_REF;
+	asse1_power: MC_Power;
+	asse1_setpos: MC_SetPosition;
+	
+	bStart AT%I*: BOOL ;                       // Start trigger for the chirp experiment (external input)
+	fbExtSetPointEnable : MC_ExtSetPointGenEnable; // Enables external setpoint generation for the axis
+	fbExtSetPointDisable : MC_ExtSetPointGenDisable; // Disables external setpoint generation
+
+	Tc: LREAL := 0.001;                        // Sampling time (in seconds), default 1 ms
+	amplitude: LREAL := 360;                  // Amplitude of the chirp signal in engineering units (e.g., degrees or mm)
+	
+	acc: LREAL := 0.0;                         // Output acceleration from the chirp generator
+	vel: LREAL := 100.0;                       // Output velocity from the chirp generator
+	pos: LREAL := 0.0;                         // Output position from the chirp generator
+	dir: DINT := 0;                            // Direction: 1 = forward, -1 = backward, 0 = stopped
+	
+	f0: LREAL := 1.0;                          // Starting frequency of the chirp signal (Hz)
+	f1: LREAL := 450.0;                        // Final frequency of the chirp signal (Hz)
+	duration: LREAL := 60.0;                   // Duration of the chirp signal (seconds)
+	UseLog AT%I*: BOOL;                        // TRUE for logarithmic chirp; FALSE for linear chirp
+	
+	running AT%Q*: BOOL;                       // TRUE when experiment is in Chirp state
+	stopping AT%Q*: BOOL;                      // TRUE during final deceleration and stop phases
+
+	chirp: FB_ChirpSignal;                    // Chirp signal generator function block instance
+	
+	act_pos: LREAL;                           // Actual position from the axis
+	act_vel: LREAL;                           // Actual velocity from the axis
+	act_torque: LREAL;                        // Actual torque from the axis
+	first_position: LREAL;                    // Position at the start of the chirp experiment
+
+	logger: FB_DataLogger;                    // File logging function block instance
+	state: E_State := E_State.None;           // Current state of the finite state machine
+
+	sFileName: T_MaxString := 'C:\Users\Administrator\Documents\binari\test1.bin'; // Binary file path
+	netId: T_AmsNetId;                        // Network ID for TwinCAT file functions
+	nTaskIdx: DINT;                           // Index of the running task
+	tmp: LREAL;                               // Temporary variable
+	idx: INT;                                 // Generic counter for delay loops
+	last_position: LREAL;                     // Position after chirp completion
+	slowing_down_vel: LREAL;                  // Velocity captured before slowing down
+END_VAR</xhtml>
+                  </InterfaceAsPlainText>
+                </data>
+                <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+                  <ObjectId>faf193ce-2e97-4df2-b838-7b2970aa0176</ObjectId>
+                </data>
+              </addData>
+            </pou>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/pou" handleUnknown="implementation">
+            <pou name="FB_ChirpSignal" pouType="functionBlock">
+              <interface>
+                <inputVars>
+                  <variable name="Start">
+                    <type>
+                      <BOOL />
+                    </type>
+                    <documentation>
+                      <xhtml xmlns="http://www.w3.org/1999/xhtml"> Start the chirp signal generation</xhtml>
+                    </documentation>
+                  </variable>
+                  <variable name="Reset">
+                    <type>
+                      <BOOL />
+                    </type>
+                    <documentation>
+                      <xhtml xmlns="http://www.w3.org/1999/xhtml"> Reset the signal and internal time</xhtml>
+                    </documentation>
+                  </variable>
+                  <variable name="Amplitude">
+                    <type>
+                      <LREAL />
+                    </type>
+                    <documentation>
+                      <xhtml xmlns="http://www.w3.org/1999/xhtml"> Amplitude of the output signal</xhtml>
+                    </documentation>
+                  </variable>
+                  <variable name="FreqStart">
+                    <type>
+                      <LREAL />
+                    </type>
+                    <documentation>
+                      <xhtml xmlns="http://www.w3.org/1999/xhtml"> Starting frequency of the chirp in Hz</xhtml>
+                    </documentation>
+                  </variable>
+                  <variable name="FreqEnd">
+                    <type>
+                      <LREAL />
+                    </type>
+                    <documentation>
+                      <xhtml xmlns="http://www.w3.org/1999/xhtml"> Ending frequency of the chirp in Hz</xhtml>
+                    </documentation>
+                  </variable>
+                  <variable name="Duration">
+                    <type>
+                      <LREAL />
+                    </type>
+                    <documentation>
+                      <xhtml xmlns="http://www.w3.org/1999/xhtml"> Total duration of the chirp signal in seconds</xhtml>
+                    </documentation>
+                  </variable>
+                  <variable name="Ts">
+                    <type>
+                      <LREAL />
+                    </type>
+                    <documentation>
+                      <xhtml xmlns="http://www.w3.org/1999/xhtml"> Sampling time (time increment per execution cycle)</xhtml>
+                    </documentation>
+                  </variable>
+                  <variable name="UseLog">
+                    <type>
+                      <BOOL />
+                    </type>
+                    <documentation>
+                      <xhtml xmlns="http://www.w3.org/1999/xhtml"> If TRUE, use logarithmic chirp; otherwise, use linear chirp</xhtml>
+                    </documentation>
+                  </variable>
+                  <variable name="UseAcc">
+                    <type>
+                      <BOOL />
+                    </type>
+                    <initialValue>
+                      <simpleValue value="FALSE" />
+                    </initialValue>
+                  </variable>
+                  <variable name="UseVel">
+                    <type>
+                      <BOOL />
+                    </type>
+                    <initialValue>
+                      <simpleValue value="TRUE" />
+                    </initialValue>
+                  </variable>
+                  <variable name="gain">
+                    <type>
+                      <LREAL />
+                    </type>
+                    <initialValue>
+                      <simpleValue value="0.1" />
+                    </initialValue>
+                  </variable>
+                </inputVars>
+                <outputVars>
+                  <variable name="t">
+                    <type>
+                      <LREAL />
+                    </type>
+                    <initialValue>
+                      <simpleValue value="0.0" />
+                    </initialValue>
+                    <documentation>
+                      <xhtml xmlns="http://www.w3.org/1999/xhtml"> Current elapsed time since the start of the chirp</xhtml>
+                    </documentation>
+                  </variable>
+                  <variable name="SignalOut">
+                    <type>
+                      <LREAL />
+                    </type>
+                    <documentation>
+                      <xhtml xmlns="http://www.w3.org/1999/xhtml"> Current output value of the chirp signal</xhtml>
+                    </documentation>
+                  </variable>
+                  <variable name="SignalDot">
+                    <type>
+                      <LREAL />
+                    </type>
+                    <documentation>
+                      <xhtml xmlns="http://www.w3.org/1999/xhtml"> First time derivative of the signal (velocity)</xhtml>
+                    </documentation>
+                  </variable>
+                  <variable name="SignalDDot">
+                    <type>
+                      <LREAL />
+                    </type>
+                    <documentation>
+                      <xhtml xmlns="http://www.w3.org/1999/xhtml"> Second time derivative of the signal (acceleration)</xhtml>
+                    </documentation>
+                  </variable>
+                  <variable name="Done">
+                    <type>
+                      <BOOL />
+                    </type>
+                    <initialValue>
+                      <simpleValue value="FALSE" />
+                    </initialValue>
+                    <documentation>
+                      <xhtml xmlns="http://www.w3.org/1999/xhtml"> TRUE when the chirp has completed (t &gt;= Duration)</xhtml>
+                    </documentation>
+                  </variable>
+                  <variable name="frequency">
+                    <type>
+                      <LREAL />
+                    </type>
+                  </variable>
+                </outputVars>
+                <localVars>
+                  <variable name="phi">
+                    <type>
+                      <LREAL />
+                    </type>
+                    <documentation>
+                      <xhtml xmlns="http://www.w3.org/1999/xhtml"> Instantaneous phase of the chirp signal</xhtml>
+                    </documentation>
+                  </variable>
+                  <variable name="dphi">
+                    <type>
+                      <LREAL />
+                    </type>
+                    <documentation>
+                      <xhtml xmlns="http://www.w3.org/1999/xhtml"> First derivative of the phase (angular velocity)</xhtml>
+                    </documentation>
+                  </variable>
+                  <variable name="ddphi">
+                    <type>
+                      <LREAL />
+                    </type>
+                    <documentation>
+                      <xhtml xmlns="http://www.w3.org/1999/xhtml"> Second derivative of the phase (angular acceleration)</xhtml>
+                    </documentation>
+                  </variable>
+                  <variable name="log_f1_f0">
+                    <type>
+                      <LREAL />
+                    </type>
+                    <documentation>
+                      <xhtml xmlns="http://www.w3.org/1999/xhtml"> Natural logarithm of the ratio FreqEnd / FreqStart</xhtml>
+                    </documentation>
+                  </variable>
+                  <variable name="beta">
+                    <type>
+                      <LREAL />
+                    </type>
+                    <documentation>
+                      <xhtml xmlns="http://www.w3.org/1999/xhtml"> Exponential growth rate for the logarithmic chirp</xhtml>
+                    </documentation>
+                  </variable>
+                  <variable name="k">
+                    <type>
+                      <LREAL />
+                    </type>
+                    <documentation>
+                      <xhtml xmlns="http://www.w3.org/1999/xhtml"> Chirp rate for linear frequency increase</xhtml>
+                    </documentation>
+                  </variable>
+                  <variable name="sin_phi">
+                    <type>
+                      <LREAL />
+                    </type>
+                    <documentation>
+                      <xhtml xmlns="http://www.w3.org/1999/xhtml"> Sine of the instantaneous phase</xhtml>
+                    </documentation>
+                  </variable>
+                  <variable name="cos_phi">
+                    <type>
+                      <LREAL />
+                    </type>
+                    <documentation>
+                      <xhtml xmlns="http://www.w3.org/1999/xhtml"> Cosine of the instantaneous phase</xhtml>
+                    </documentation>
+                  </variable>
+                  <variable name="A">
+                    <type>
+                      <LREAL />
+                    </type>
+                  </variable>
+                  <variable name="bias_compensation">
+                    <type>
+                      <LREAL />
+                    </type>
+                  </variable>
+                </localVars>
+              </interface>
+              <body>
+                <ST>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">(*
+------------------------------------------------------------------------------
+FB_ChirpSignal - Chirp Signal Generator
+
+DESCRIPTION:
+This function block generates either a linear or logarithmic chirp signal 
+and computes its first and second derivatives. It is designed for use in 
+control systems, signal injection, testing, or identification routines.
+
+FEATURES:
+- Supports both linear and logarithmic frequency sweep modes
+- Outputs the chirp signal and its time derivatives (velocity and acceleration)
+- Real-time execution suitable for cyclic PLC tasks
+- Clean reset behavior and chirp completion detection via Done output
+
+INPUTS:
+- Start      : BOOL    → Starts the chirp generation
+- Reset      : BOOL    → Resets the internal time and outputs
+- Amplitude  : LREAL   → Amplitude of the signal
+- FreqStart  : LREAL   → Starting frequency (Hz)
+- FreqEnd    : LREAL   → Ending frequency (Hz)
+- Duration   : LREAL   → Duration of the chirp (s)
+- Ts         : LREAL   → Sampling time (s)
+- UseLog     : BOOL    → TRUE for logarithmic chirp, FALSE for linear
+
+OUTPUTS:
+- t          : LREAL   → Elapsed time (s)
+- SignalOut  : LREAL   → Output signal value (sinusoidal chirp)
+- SignalDot  : LREAL   → First derivative of the signal (velocity)
+- SignalDDot : LREAL   → Second derivative of the signal (acceleration)
+- Done       : BOOL    → TRUE when chirp duration is complete
+
+USAGE:
+Call the block cyclically with the appropriate sampling time (Ts).
+Keep 'Start' TRUE during the chirp. Set 'Reset' TRUE to reinitialize.
+
+VERSION:
+v1.0 - March 2025
+
+AUTHOR:
+Manuel Beschi JRL-CARI cari.unibs.it
+
+------------------------------------------------------------------------------
+*)
+
+// Reset state
+IF Reset THEN
+    // Clear elapsed time and output signals when reset is active
+    t := 0.0;
+    SignalOut := 0.0;
+    SignalDot := 0.0;
+    SignalDDot := 0.0;
+	frequency:=0.0;
+	Done := FALSE;
+
+
+ELSIF Start THEN
+    // If Start is active and we are still within the chirp duration
+    IF t &lt; Duration THEN
+
+		IF UseVel THEN
+			A:= Amplitude*(2*PI*FreqStart);
+		ELSIF UseAcc THEN
+			A:= Amplitude*EXPT(2*PI*FreqStart,2);
+		END_IF
+		
+        IF UseLog THEN
+            // --- Logarithmic Chirp Signal ---
+            // f(t) = f0 * exp(beta * t)
+            // phi(t) = (2π * f0 / beta) * (exp(beta * t) - 1)
+
+            IF FreqStart &gt; 0.0 AND FreqEnd &gt; 0.0 THEN
+                // Compute logarithmic frequency scaling parameters
+                log_f1_f0 := LN(FreqEnd / FreqStart);          // log(f1/f0)
+                beta := log_f1_f0 / Duration;                  // Exponential growth rate
+                phi := 2.0 * PI * FreqStart * (EXP(beta * t) - 1.0) / beta; // Phase
+                dphi := 2.0 * PI * FreqStart * EXP(beta * t); // First derivative of phase (angular velocity)
+                ddphi := dphi * beta;                          // Second derivative of phase
+				frequency:=FreqStart*EXP(beta*t);
+            ELSE
+                // Safety fallback if frequencies are invalid
+                phi := 0.0;
+                dphi := 0.0;
+                ddphi := 0.0;
+            END_IF
+
+        ELSE
+            // --- Linear Chirp Signal ---
+            // f(t) = f0 + k * t, where k = (f1 - f0)/Duration
+            // phi(t) = 2π * (f0 * t + 0.5 * k * t^2)
+			
+			
+            k := (FreqEnd - FreqStart) / Duration;                     // Linear chirp rate
+            phi := 2.0 * PI * (FreqStart * t + 0.5 * k * t * t);       // Phase
+            dphi := 2.0 * PI * (FreqStart + k * t);                    // First derivative of phase
+            ddphi := 2.0 * PI * k;                                     // Second derivative of phase
+			frequency:=FreqStart+k*t;
+        END_IF
+
+        // Compute signal and its derivatives
+        sin_phi := SIN(phi);  // Calculate sine of the phase
+        cos_phi := COS(phi);  // Calculate cosine of the phase
+
+		
+        // Main signal and its time derivatives
+        IF UseVel THEN
+			SignalDot := A * sin_phi +bias_compensation;          
+        	SignalOut := SignalOut + SignalDot*Ts  ;                 
+			SignalDDot := A * dphi * cos_phi;                       
+		ELSIF UseAcc THEN
+			bias_compensation := -gain*SignalDot;
+			SignalDDot := A * sin_phi +bias_compensation;           // Second derivative (acceleration): Chirp signal value
+        	SignalOut := SignalOut + SignalDot*Ts + 0.5*SignalDDot*EXPT(Ts,2); // Position
+			SignalDot := SignalDot + SignalDDot*Ts  ;                            // First derivative (velocity)
+        ELSE
+			SignalOut := A * sin_phi;                                 // Chirp signal value
+        	SignalDot := A * dphi * cos_phi;                          // First derivative (velocity)
+        	SignalDDot := A * (ddphi * cos_phi - dphi * dphi * sin_phi); // Second derivative (acceleration)
+		END_IF
+
+        t := t + Ts;       // Advance internal time by the sampling time
+        Done := FALSE;     // Chirp is still running
+
+    ELSE
+        // Chirp duration completed, set outputs to 0 and flag as done
+        SignalOut := 0.0;
+        SignalDot := 0.0;
+        SignalDDot := 0.0;
+        Done := TRUE;
+    END_IF
+END_IF</xhtml>
+                </ST>
+              </body>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/interfaceasplaintext" handleUnknown="implementation">
+                  <InterfaceAsPlainText>
+                    <xhtml xmlns="http://www.w3.org/1999/xhtml">FUNCTION_BLOCK FB_ChirpSignal
+VAR_INPUT
+    Start : BOOL;              // Start the chirp signal generation
+    Reset : BOOL;              // Reset the signal and internal time
+    Amplitude : LREAL;         // Amplitude of the output signal
+    FreqStart : LREAL;         // Starting frequency of the chirp in Hz
+    FreqEnd : LREAL;           // Ending frequency of the chirp in Hz
+    Duration : LREAL;          // Total duration of the chirp signal in seconds
+    Ts : LREAL;                // Sampling time (time increment per execution cycle)
+    UseLog : BOOL;             // If TRUE, use logarithmic chirp; otherwise, use linear chirp
+	UseAcc: BOOL := FALSE;
+	UseVel: BOOL := TRUE;
+	gain: LREAL := 0.1;
+
+END_VAR
+VAR_OUTPUT
+    t : LREAL := 0.0;          // Current elapsed time since the start of the chirp
+    SignalOut : LREAL;         // Current output value of the chirp signal
+    SignalDot : LREAL;         // First time derivative of the signal (velocity)
+    SignalDDot : LREAL;        // Second time derivative of the signal (acceleration)
+    Done: BOOL:=FALSE;         // TRUE when the chirp has completed (t &gt;= Duration)
+	frequency: LREAL;
+END_VAR
+VAR
+    phi : LREAL;               // Instantaneous phase of the chirp signal
+    dphi : LREAL;              // First derivative of the phase (angular velocity)
+    ddphi : LREAL;             // Second derivative of the phase (angular acceleration)
+    log_f1_f0 : LREAL;         // Natural logarithm of the ratio FreqEnd / FreqStart
+    beta : LREAL;              // Exponential growth rate for the logarithmic chirp
+    k : LREAL;                 // Chirp rate for linear frequency increase
+    sin_phi : LREAL;           // Sine of the instantaneous phase
+    cos_phi : LREAL;           // Cosine of the instantaneous phase
+	A: LREAL;
+	bias_compensation: LREAL;
+END_VAR</xhtml>
+                  </InterfaceAsPlainText>
+                </data>
+                <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+                  <ObjectId>272199dc-555e-492f-983a-467c5fb04b4e</ObjectId>
+                </data>
+              </addData>
+            </pou>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/pou" handleUnknown="implementation">
+            <pou name="FB_DataLogger" pouType="functionBlock">
+              <interface>
+                <inputVars>
+                  <variable name="netId">
+                    <type>
+                      <derived name="T_AmsNetId" />
+                    </type>
+                    <documentation>
+                      <xhtml xmlns="http://www.w3.org/1999/xhtml"> TwinCAT network ID (e.g., '')</xhtml>
+                    </documentation>
+                  </variable>
+                  <variable name="sFileName">
+                    <type>
+                      <derived name="T_MaxString" />
+                    </type>
+                    <documentation>
+                      <xhtml xmlns="http://www.w3.org/1999/xhtml"> File path and name (e.g., 'C:\Logs\data.bin')</xhtml>
+                    </documentation>
+                  </variable>
+                  <variable name="bOpen">
+                    <type>
+                      <BOOL />
+                    </type>
+                    <documentation>
+                      <xhtml xmlns="http://www.w3.org/1999/xhtml"> Rising edge to trigger file open</xhtml>
+                    </documentation>
+                  </variable>
+                  <variable name="bWrite">
+                    <type>
+                      <BOOL />
+                    </type>
+                    <documentation>
+                      <xhtml xmlns="http://www.w3.org/1999/xhtml"> Rising edge to trigger data write</xhtml>
+                    </documentation>
+                  </variable>
+                  <variable name="bClose">
+                    <type>
+                      <BOOL />
+                    </type>
+                    <documentation>
+                      <xhtml xmlns="http://www.w3.org/1999/xhtml"> Rising edge to trigger file close</xhtml>
+                    </documentation>
+                  </variable>
+                  <variable name="t">
+                    <type>
+                      <LREAL />
+                    </type>
+                    <documentation>
+                      <xhtml xmlns="http://www.w3.org/1999/xhtml"> Timestamp or simulation time</xhtml>
+                    </documentation>
+                  </variable>
+                  <variable name="act_pos">
+                    <type>
+                      <LREAL />
+                    </type>
+                    <documentation>
+                      <xhtml xmlns="http://www.w3.org/1999/xhtml"> Actual position to log</xhtml>
+                    </documentation>
+                  </variable>
+                  <variable name="act_vel">
+                    <type>
+                      <LREAL />
+                    </type>
+                    <documentation>
+                      <xhtml xmlns="http://www.w3.org/1999/xhtml"> Actual velocity to log</xhtml>
+                    </documentation>
+                  </variable>
+                  <variable name="act_torque">
+                    <type>
+                      <LREAL />
+                    </type>
+                    <documentation>
+                      <xhtml xmlns="http://www.w3.org/1999/xhtml"> Actual torque to log</xhtml>
+                    </documentation>
+                  </variable>
+                </inputVars>
+                <outputVars>
+                  <variable name="bDone">
+                    <type>
+                      <BOOL />
+                    </type>
+                    <documentation>
+                      <xhtml xmlns="http://www.w3.org/1999/xhtml"> Set TRUE when file is successfully closed</xhtml>
+                    </documentation>
+                  </variable>
+                  <variable name="bBusy">
+                    <type>
+                      <BOOL />
+                    </type>
+                    <documentation>
+                      <xhtml xmlns="http://www.w3.org/1999/xhtml"> Indicates if file operation is in progress</xhtml>
+                    </documentation>
+                  </variable>
+                  <variable name="bError">
+                    <type>
+                      <BOOL />
+                    </type>
+                    <documentation>
+                      <xhtml xmlns="http://www.w3.org/1999/xhtml"> Set TRUE on any error</xhtml>
+                    </documentation>
+                  </variable>
+                  <variable name="nErrorId">
+                    <type>
+                      <UDINT />
+                    </type>
+                    <documentation>
+                      <xhtml xmlns="http://www.w3.org/1999/xhtml"> TwinCAT file function error code</xhtml>
+                    </documentation>
+                  </variable>
+                  <variable name="hFile">
+                    <type>
+                      <UINT />
+                    </type>
+                    <documentation>
+                      <xhtml xmlns="http://www.w3.org/1999/xhtml"> File handle (used for writing/closing)</xhtml>
+                    </documentation>
+                  </variable>
+                </outputVars>
+                <localVars>
+                  <variable name="dataBuffer">
+                    <type>
+                      <array>
+                        <dimension lower="1" upper="4" />
+                        <baseType>
+                          <LREAL />
+                        </baseType>
+                      </array>
+                    </type>
+                    <documentation>
+                      <xhtml xmlns="http://www.w3.org/1999/xhtml"> Buffer for logging data</xhtml>
+                    </documentation>
+                  </variable>
+                  <variable name="nBytesToWrite">
+                    <type>
+                      <UDINT />
+                    </type>
+                    <documentation>
+                      <xhtml xmlns="http://www.w3.org/1999/xhtml"> Number of bytes to write</xhtml>
+                    </documentation>
+                  </variable>
+                  <variable name="fbFileOpen">
+                    <type>
+                      <derived name="FB_FileOpen" />
+                    </type>
+                    <documentation>
+                      <xhtml xmlns="http://www.w3.org/1999/xhtml"> File open function block</xhtml>
+                    </documentation>
+                  </variable>
+                  <variable name="fbFileWrite">
+                    <type>
+                      <derived name="FB_FileWrite" />
+                    </type>
+                    <documentation>
+                      <xhtml xmlns="http://www.w3.org/1999/xhtml"> File write function block</xhtml>
+                    </documentation>
+                  </variable>
+                  <variable name="fbFileClose">
+                    <type>
+                      <derived name="FB_FileClose" />
+                    </type>
+                    <documentation>
+                      <xhtml xmlns="http://www.w3.org/1999/xhtml"> File close function block</xhtml>
+                    </documentation>
+                  </variable>
+                  <variable name="bFileOpen">
+                    <type>
+                      <BOOL />
+                    </type>
+                    <initialValue>
+                      <simpleValue value="TRUE" />
+                    </initialValue>
+                    <documentation>
+                      <xhtml xmlns="http://www.w3.org/1999/xhtml"> Internal flag for open execution control</xhtml>
+                    </documentation>
+                  </variable>
+                </localVars>
+              </interface>
+              <body>
+                <ST>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">(*
+------------------------------------------------------------------------------
+FB_DataLogger - Binary Data Logger Function Block
+
+DESCRIPTION:
+This function block logs a set of numerical values (e.g., timestamp, position,
+velocity, torque) into a binary file. It is suitable for real-time signal logging
+during experiments, simulations, or runtime testing.
+
+FEATURES:
+- Handles file opening, writing, and closing internally
+- Binary file format using an LREAL array
+- 5-second timeout protection for each file operation
+- Outputs useful status flags for diagnostics and visualization
+- File handle exposed for integration with other blocks
+
+INPUTS:
+- netId      : T_AmsNetId  → Network ID (use '' for local)
+- sFileName  : T_MaxString → Full path to the file to open/write
+- bOpen      : BOOL        → Trigger to open the file
+- bWrite     : BOOL        → Trigger to write a data sample
+- bClose     : BOOL        → Trigger to close the file
+- t          : LREAL       → Time value to log
+- act_pos    : LREAL       → Position value to log
+- act_vel    : LREAL       → Velocity value to log
+- act_torque : LREAL       → Torque value to log
+
+OUTPUTS:
+- bDone      : BOOL    → TRUE when file closed successfully
+- bBusy      : BOOL    → TRUE when file close is ongoing
+- bError     : BOOL    → TRUE if any file operation fails
+- nErrorId   : UDINT   → Error code from TwinCAT file functions
+- hFile      : UINT    → File handle currently in use
+
+USAGE:
+Call this block cyclically. Use rising edge triggers for bOpen, bWrite, and bClose.
+Data is written in binary format using `ARRAY[1..4] OF LREAL`. Suitable for analysis
+with external tools or for real-time streaming to memory buffers.
+
+VERSION:
+v1.0 - March 2025
+
+AUTHOR:
+Manuel Beschi cari.unibs.it
+
+------------------------------------------------------------------------------
+*)
+
+// === Step 1: Open File ===
+IF bOpen THEN
+    // Perform a two-step execution to latch rising edge for file open
+    fbFileOpen(
+        sPathName := sFileName,
+        nMode     := FOPEN_MODEWRITE OR FOPEN_MODEBINARY, // Overwrites if exists
+        sNetId    := netId,
+        bExecute  := FALSE,
+        tTimeout  := T#5S // 5 seconds timeout
+    );
+    fbFileOpen(
+        sPathName := sFileName,
+        nMode     := FOPEN_MODEWRITE OR FOPEN_MODEBINARY,
+        sNetId    := netId,
+        bExecute  := TRUE,
+        tTimeout  := T#5S // 5 seconds timeout
+    );
+
+    // Check file open result
+    IF NOT fbFileOpen.bBusy THEN
+        IF NOT fbFileOpen.bError THEN
+            hFile := fbFileOpen.hFile;
+            bOpen := FALSE; // Reset trigger
+        ELSE
+            bError := TRUE;
+            nErrorId := fbFileOpen.nErrId;
+        END_IF
+    END_IF
+END_IF
+
+// Safety check if open is still busy (extra safe check)
+IF fbFileOpen.bBusy THEN
+    fbFileOpen(); // Call again to keep evaluating
+    IF NOT fbFileOpen.bError THEN
+        hFile := fbFileOpen.hFile;
+        bOpen := FALSE;
+    ELSE
+        bError := TRUE;
+        nErrorId := fbFileOpen.nErrId;
+    END_IF
+END_IF
+
+// === Step 2: Write Data ===
+IF bWrite AND (NOT fbFileOpen.bBusy) THEN
+    // Prepare data buffer with current inputs
+    dataBuffer[1] := t;
+    dataBuffer[2] := act_pos;
+    dataBuffer[3] := act_vel;
+    dataBuffer[4] := act_torque;
+
+    nBytesToWrite := SIZEOF(dataBuffer); // Size in bytes
+
+    // Do a two-step write with rising edge simulation
+    fbFileWrite(
+        sNetId      := netId,
+        hFile       := hFile,
+        pWriteBuff  := ADR(dataBuffer),
+        cbWriteLen  := nBytesToWrite,
+        bExecute    := FALSE
+    );
+    fbFileWrite(
+        sNetId      := netId,
+        hFile       := hFile,
+        pWriteBuff  := ADR(dataBuffer),
+        cbWriteLen  := nBytesToWrite,
+        bExecute    := TRUE
+    );
+END_IF
+
+// === Step 3: Close File ===
+IF bClose THEN
+    fbFileClose.bExecute := FALSE; // Rising edge handling
+
+    // Execute close operation
+    fbFileClose(
+        hFile     := hFile,
+        bExecute  := TRUE,
+        tTimeout  := T#5S
+    );
+
+    // Output states
+    bBusy := fbFileClose.bBusy;
+    bError := fbFileClose.bError;
+    nErrorId := fbFileClose.nErrId;
+
+    // Check if closed successfully
+    IF NOT fbFileClose.bBusy THEN
+        IF NOT fbFileClose.bError THEN
+            bClose := FALSE;
+            bDone := TRUE;
+            hFile := 0; // Invalidate handle
+        END_IF
+    END_IF
+ELSE
+    bDone := FALSE; // Clear done when not closing
+END_IF
+
+</xhtml>
+                </ST>
+              </body>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/interfaceasplaintext" handleUnknown="implementation">
+                  <InterfaceAsPlainText>
+                    <xhtml xmlns="http://www.w3.org/1999/xhtml">FUNCTION_BLOCK FB_DataLogger
+VAR_INPUT
+    netId       : T_AmsNetId;        // TwinCAT network ID (e.g., '')
+    sFileName   : T_MaxString;       // File path and name (e.g., 'C:\Logs\data.bin')
+    bOpen       : BOOL;              // Rising edge to trigger file open
+    bWrite      : BOOL;              // Rising edge to trigger data write
+    bClose      : BOOL;              // Rising edge to trigger file close
+    t           : LREAL;             // Timestamp or simulation time
+    act_pos     : LREAL;             // Actual position to log
+    act_vel     : LREAL;             // Actual velocity to log
+    act_torque  : LREAL;             // Actual torque to log
+END_VAR
+VAR_OUTPUT
+    bDone       : BOOL;              // Set TRUE when file is successfully closed
+    bBusy       : BOOL;              // Indicates if file operation is in progress
+    bError      : BOOL;              // Set TRUE on any error
+    nErrorId    : UDINT;             // TwinCAT file function error code
+    hFile       : UINT;              // File handle (used for writing/closing)
+END_VAR
+VAR
+    dataBuffer     : ARRAY[1..4] OF LREAL;  // Buffer for logging data
+    nBytesToWrite  : UDINT;                 // Number of bytes to write
+    fbFileOpen     : FB_FileOpen;           // File open function block
+    fbFileWrite    : FB_FileWrite;          // File write function block
+    fbFileClose    : FB_FileClose;          // File close function block
+    bFileOpen      : BOOL := TRUE;          // Internal flag for open execution control
+END_VAR
+
+VAR_TEMP
+	
+END_VAR</xhtml>
+                  </InterfaceAsPlainText>
+                </data>
+                <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+                  <ObjectId>3bd8a5df-1906-462a-97d8-187cdf922de2</ObjectId>
+                </data>
+              </addData>
+            </pou>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/libraries" handleUnknown="implementation">
+            <Libraries>
+              <Library Name="#Tc2_MC2" Namespace="Tc2_MC2" HideWhenReferencedAsDependency="false" PublishSymbolsInContainer="false" SystemLibrary="false" LinkAllContent="false" DefaultResolution="Tc2_MC2, * (Beckhoff Automation GmbH)" />
+              <Library Name="#Tc2_Standard" Namespace="Tc2_Standard" HideWhenReferencedAsDependency="false" PublishSymbolsInContainer="false" SystemLibrary="false" LinkAllContent="false" DefaultResolution="Tc2_Standard, * (Beckhoff Automation GmbH)" />
+              <Library Name="#Tc2_System" Namespace="Tc2_System" HideWhenReferencedAsDependency="false" PublishSymbolsInContainer="false" SystemLibrary="false" LinkAllContent="false" DefaultResolution="Tc2_System, * (Beckhoff Automation GmbH)">
+                <Parameters>
+                  <Parameter Name="PARAM.TABLE_UPPER_BOUND" Value="15" />
+                  <Parameter Name="PARAM.STRING_LENGTH_EXP" Value="255" />
+                  <Parameter Name="PARAM.STRING_LENGTH_ADDRESS" Value="20" />
+                  <Parameter Name="PARAM.STRING_LENGTH_COMMENT" Value="255" />
+                  <Parameter Name="PARAM.STRING_LENGTH_OUTSTRING" Value="255" />
+                  <Parameter Name="PARAM.TABLE_SHOW_VALID_ITEMS" Value="FALSE" />
+                </Parameters>
+              </Library>
+              <Library Name="#Tc3_Module" Namespace="Tc3_Module" HideWhenReferencedAsDependency="false" PublishSymbolsInContainer="false" SystemLibrary="false" LinkAllContent="false" DefaultResolution="Tc3_Module, * (Beckhoff Automation GmbH)" />
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+                  <ObjectId>b55d1192-e4cb-469b-81cb-1a9f73118c31</ObjectId>
+                </data>
+              </addData>
+            </Libraries>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>a1beb0ff-ddcc-470e-bc51-6ea76c38972d</ObjectId>
+          </data>
+        </addData>
+      </resource>
+    </data>
+    <data name="http://www.3s-software.com/plcopenxml/projectstructure" handleUnknown="discard">
+      <ProjectStructure>
+        <Object Name="ChirpTest" ObjectId="a1beb0ff-ddcc-470e-bc51-6ea76c38972d">
+          <Object Name="Library Manager" ObjectId="b55d1192-e4cb-469b-81cb-1a9f73118c31" />
+          <Folder Name="DUTs">
+            <Object Name="E_State" ObjectId="a6dadeb0-de4a-4bbf-9467-24a4deb8eae2" />
+          </Folder>
+          <Object Name="PlcTask" ObjectId="fc14ddeb-4478-4c88-835f-7fdc97c6d7f4" />
+          <Folder Name="POUs">
+            <Object Name="ChirpTest" ObjectId="faf193ce-2e97-4df2-b838-7b2970aa0176" />
+            <Folder Name="POUs">
+              <Object Name="FB_ChirpSignal" ObjectId="272199dc-555e-492f-983a-467c5fb04b4e" />
+              <Object Name="FB_DataLogger" ObjectId="3bd8a5df-1906-462a-97d8-187cdf922de2" />
+            </Folder>
+          </Folder>
+        </Object>
+      </ProjectStructure>
+    </data>
+  </addData>
+</project>
