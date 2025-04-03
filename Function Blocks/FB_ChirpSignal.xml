@@ -1,0 +1,421 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<project xmlns="http://www.plcopen.org/xml/tc6_0200">
+  <fileHeader companyName="Beckhoff Automation GmbH" productName="TwinCAT PLC Control" productVersion="3.5.13.21" creationDateTime="2025-04-03T10:08:33.0983697" />
+  <types>
+    <dataTypes />
+    <pous>
+      <pou name="FB_ChirpSignal" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="Start">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> Start the chirp signal generation</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Reset">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> Reset the signal and internal time</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Amplitude">
+              <type>
+                <LREAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> Amplitude of the output signal</xhtml>
+              </documentation>
+            </variable>
+            <variable name="FreqStart">
+              <type>
+                <LREAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> Starting frequency of the chirp in Hz</xhtml>
+              </documentation>
+            </variable>
+            <variable name="FreqEnd">
+              <type>
+                <LREAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> Ending frequency of the chirp in Hz</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Duration">
+              <type>
+                <LREAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> Total duration of the chirp signal in seconds</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Ts">
+              <type>
+                <LREAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> Sampling time (time increment per execution cycle)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="UseLog">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> If TRUE, use logarithmic chirp; otherwise, use linear chirp</xhtml>
+              </documentation>
+            </variable>
+            <variable name="UseAcc">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+            </variable>
+            <variable name="UseVel">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="TRUE" />
+              </initialValue>
+            </variable>
+            <variable name="gain">
+              <type>
+                <LREAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.1" />
+              </initialValue>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="t">
+              <type>
+                <LREAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.0" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> Current elapsed time since the start of the chirp</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SignalOut">
+              <type>
+                <LREAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> Current output value of the chirp signal</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SignalDot">
+              <type>
+                <LREAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> First time derivative of the signal (velocity)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SignalDDot">
+              <type>
+                <LREAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> Second time derivative of the signal (acceleration)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Done">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> TRUE when the chirp has completed (t &gt;= Duration)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="frequency">
+              <type>
+                <LREAL />
+              </type>
+            </variable>
+          </outputVars>
+          <localVars>
+            <variable name="phi">
+              <type>
+                <LREAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> Instantaneous phase of the chirp signal</xhtml>
+              </documentation>
+            </variable>
+            <variable name="dphi">
+              <type>
+                <LREAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> First derivative of the phase (angular velocity)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ddphi">
+              <type>
+                <LREAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> Second derivative of the phase (angular acceleration)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="log_f1_f0">
+              <type>
+                <LREAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> Natural logarithm of the ratio FreqEnd / FreqStart</xhtml>
+              </documentation>
+            </variable>
+            <variable name="beta">
+              <type>
+                <LREAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> Exponential growth rate for the logarithmic chirp</xhtml>
+              </documentation>
+            </variable>
+            <variable name="k">
+              <type>
+                <LREAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> Chirp rate for linear frequency increase</xhtml>
+              </documentation>
+            </variable>
+            <variable name="sin_phi">
+              <type>
+                <LREAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> Sine of the instantaneous phase</xhtml>
+              </documentation>
+            </variable>
+            <variable name="cos_phi">
+              <type>
+                <LREAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> Cosine of the instantaneous phase</xhtml>
+              </documentation>
+            </variable>
+            <variable name="A">
+              <type>
+                <LREAL />
+              </type>
+            </variable>
+            <variable name="bias_compensation">
+              <type>
+                <LREAL />
+              </type>
+            </variable>
+          </localVars>
+        </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">(*
+------------------------------------------------------------------------------
+FB_ChirpSignal - Chirp Signal Generator
+
+DESCRIPTION:
+This function block generates either a linear or logarithmic chirp signal 
+and computes its first and second derivatives. It is designed for use in 
+control systems, signal injection, testing, or identification routines.
+
+FEATURES:
+- Supports both linear and logarithmic frequency sweep modes
+- Outputs the chirp signal and its time derivatives (velocity and acceleration)
+- Real-time execution suitable for cyclic PLC tasks
+- Clean reset behavior and chirp completion detection via Done output
+
+INPUTS:
+- Start      : BOOL    → Starts the chirp generation
+- Reset      : BOOL    → Resets the internal time and outputs
+- Amplitude  : LREAL   → Amplitude of the signal
+- FreqStart  : LREAL   → Starting frequency (Hz)
+- FreqEnd    : LREAL   → Ending frequency (Hz)
+- Duration   : LREAL   → Duration of the chirp (s)
+- Ts         : LREAL   → Sampling time (s)
+- UseLog     : BOOL    → TRUE for logarithmic chirp, FALSE for linear
+
+OUTPUTS:
+- t          : LREAL   → Elapsed time (s)
+- SignalOut  : LREAL   → Output signal value (sinusoidal chirp)
+- SignalDot  : LREAL   → First derivative of the signal (velocity)
+- SignalDDot : LREAL   → Second derivative of the signal (acceleration)
+- Done       : BOOL    → TRUE when chirp duration is complete
+
+USAGE:
+Call the block cyclically with the appropriate sampling time (Ts).
+Keep 'Start' TRUE during the chirp. Set 'Reset' TRUE to reinitialize.
+
+VERSION:
+v1.0 - March 2025
+
+AUTHOR:
+Manuel Beschi JRL-CARI cari.unibs.it
+
+------------------------------------------------------------------------------
+*)
+
+// Reset state
+IF Reset THEN
+    // Clear elapsed time and output signals when reset is active
+    t := 0.0;
+    SignalOut := 0.0;
+    SignalDot := 0.0;
+    SignalDDot := 0.0;
+	frequency:=0.0;
+	Done := FALSE;
+
+
+ELSIF Start THEN
+    // If Start is active and we are still within the chirp duration
+    IF t &lt; Duration THEN
+
+		IF UseVel THEN
+			A:= Amplitude*(2*PI*FreqStart);
+		ELSIF UseAcc THEN
+			A:= Amplitude*EXPT(2*PI*FreqStart,2);
+		END_IF
+		
+        IF UseLog THEN
+            // --- Logarithmic Chirp Signal ---
+            // f(t) = f0 * exp(beta * t)
+            // phi(t) = (2π * f0 / beta) * (exp(beta * t) - 1)
+
+            IF FreqStart &gt; 0.0 AND FreqEnd &gt; 0.0 THEN
+                // Compute logarithmic frequency scaling parameters
+                log_f1_f0 := LN(FreqEnd / FreqStart);          // log(f1/f0)
+                beta := log_f1_f0 / Duration;                  // Exponential growth rate
+                phi := 2.0 * PI * FreqStart * (EXP(beta * t) - 1.0) / beta; // Phase
+                dphi := 2.0 * PI * FreqStart * EXP(beta * t); // First derivative of phase (angular velocity)
+                ddphi := dphi * beta;                          // Second derivative of phase
+				frequency:=FreqStart*EXP(beta*t);
+            ELSE
+                // Safety fallback if frequencies are invalid
+                phi := 0.0;
+                dphi := 0.0;
+                ddphi := 0.0;
+            END_IF
+
+        ELSE
+            // --- Linear Chirp Signal ---
+            // f(t) = f0 + k * t, where k = (f1 - f0)/Duration
+            // phi(t) = 2π * (f0 * t + 0.5 * k * t^2)
+			
+			
+            k := (FreqEnd - FreqStart) / Duration;                     // Linear chirp rate
+            phi := 2.0 * PI * (FreqStart * t + 0.5 * k * t * t);       // Phase
+            dphi := 2.0 * PI * (FreqStart + k * t);                    // First derivative of phase
+            ddphi := 2.0 * PI * k;                                     // Second derivative of phase
+			frequency:=FreqStart+k*t;
+        END_IF
+
+        // Compute signal and its derivatives
+        sin_phi := SIN(phi);  // Calculate sine of the phase
+        cos_phi := COS(phi);  // Calculate cosine of the phase
+
+		
+        // Main signal and its time derivatives
+        IF UseVel THEN
+			SignalDot := A * sin_phi +bias_compensation;          
+        	SignalOut := SignalOut + SignalDot*Ts  ;                 
+			SignalDDot := A * dphi * cos_phi;                       
+		ELSIF UseAcc THEN
+			bias_compensation := -gain*SignalDot;
+			SignalDDot := A * sin_phi +bias_compensation;           // Second derivative (acceleration): Chirp signal value
+        	SignalOut := SignalOut + SignalDot*Ts + 0.5*SignalDDot*EXPT(Ts,2); // Position
+			SignalDot := SignalDot + SignalDDot*Ts  ;                            // First derivative (velocity)
+        ELSE
+			SignalOut := A * sin_phi;                                 // Chirp signal value
+        	SignalDot := A * dphi * cos_phi;                          // First derivative (velocity)
+        	SignalDDot := A * (ddphi * cos_phi - dphi * dphi * sin_phi); // Second derivative (acceleration)
+		END_IF
+
+        t := t + Ts;       // Advance internal time by the sampling time
+        Done := FALSE;     // Chirp is still running
+
+    ELSE
+        // Chirp duration completed, set outputs to 0 and flag as done
+        SignalOut := 0.0;
+        SignalDot := 0.0;
+        SignalDDot := 0.0;
+        Done := TRUE;
+    END_IF
+END_IF</xhtml>
+          </ST>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/interfaceasplaintext" handleUnknown="implementation">
+            <InterfaceAsPlainText>
+              <xhtml xmlns="http://www.w3.org/1999/xhtml">FUNCTION_BLOCK FB_ChirpSignal
+VAR_INPUT
+    Start : BOOL;              // Start the chirp signal generation
+    Reset : BOOL;              // Reset the signal and internal time
+    Amplitude : LREAL;         // Amplitude of the output signal
+    FreqStart : LREAL;         // Starting frequency of the chirp in Hz
+    FreqEnd : LREAL;           // Ending frequency of the chirp in Hz
+    Duration : LREAL;          // Total duration of the chirp signal in seconds
+    Ts : LREAL;                // Sampling time (time increment per execution cycle)
+    UseLog : BOOL;             // If TRUE, use logarithmic chirp; otherwise, use linear chirp
+	UseAcc: BOOL := FALSE;
+	UseVel: BOOL := TRUE;
+	gain: LREAL := 0.1;
+
+END_VAR
+VAR_OUTPUT
+    t : LREAL := 0.0;          // Current elapsed time since the start of the chirp
+    SignalOut : LREAL;         // Current output value of the chirp signal
+    SignalDot : LREAL;         // First time derivative of the signal (velocity)
+    SignalDDot : LREAL;        // Second time derivative of the signal (acceleration)
+    Done: BOOL:=FALSE;         // TRUE when the chirp has completed (t &gt;= Duration)
+	frequency: LREAL;
+END_VAR
+VAR
+    phi : LREAL;               // Instantaneous phase of the chirp signal
+    dphi : LREAL;              // First derivative of the phase (angular velocity)
+    ddphi : LREAL;             // Second derivative of the phase (angular acceleration)
+    log_f1_f0 : LREAL;         // Natural logarithm of the ratio FreqEnd / FreqStart
+    beta : LREAL;              // Exponential growth rate for the logarithmic chirp
+    k : LREAL;                 // Chirp rate for linear frequency increase
+    sin_phi : LREAL;           // Sine of the instantaneous phase
+    cos_phi : LREAL;           // Cosine of the instantaneous phase
+	A: LREAL;
+	bias_compensation: LREAL;
+END_VAR</xhtml>
+            </InterfaceAsPlainText>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>272199dc-555e-492f-983a-467c5fb04b4e</ObjectId>
+          </data>
+        </addData>
+      </pou>
+    </pous>
+  </types>
+  <instances>
+    <configurations />
+  </instances>
+  <addData>
+    <data name="http://www.3s-software.com/plcopenxml/projectstructure" handleUnknown="discard">
+      <ProjectStructure>
+        <Object Name="FB_ChirpSignal" ObjectId="272199dc-555e-492f-983a-467c5fb04b4e" />
+      </ProjectStructure>
+    </data>
+  </addData>
+</project>
