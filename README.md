@@ -1,5 +1,5 @@
 
-# 🦾 LabAutoIEC611311
+#  LabAutoIEC611311
 
 This repository is maintained by the Robotics Joint Research Lab (JRL) between STIIMA-CNR and the University of Brescia. It includes IEC 61131-3 compliant examples, reusable function blocks, and utilities designed for educational and applied automation contexts using IEC611311.
 
