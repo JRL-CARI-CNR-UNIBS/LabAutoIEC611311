@@ -1,0 +1,387 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<project xmlns="http://www.plcopen.org/xml/tc6_0200">
+  <fileHeader companyName="Beckhoff Automation GmbH" productName="TwinCAT PLC Control" productVersion="3.5.13.21" creationDateTime="2025-04-03T10:43:18.9008552" />
+  <types>
+    <dataTypes />
+    <pous>
+      <pou name="FB_DataLogger" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="netId">
+              <type>
+                <derived name="T_AmsNetId" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> TwinCAT network ID (e.g., '')</xhtml>
+              </documentation>
+            </variable>
+            <variable name="sFileName">
+              <type>
+                <derived name="T_MaxString" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> File path and name (e.g., 'C:\Logs\data.bin')</xhtml>
+              </documentation>
+            </variable>
+            <variable name="bOpen">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> Rising edge to trigger file open</xhtml>
+              </documentation>
+            </variable>
+            <variable name="bWrite">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> Rising edge to trigger data write</xhtml>
+              </documentation>
+            </variable>
+            <variable name="bClose">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> Rising edge to trigger file close</xhtml>
+              </documentation>
+            </variable>
+            <variable name="t">
+              <type>
+                <LREAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> Timestamp or simulation time</xhtml>
+              </documentation>
+            </variable>
+            <variable name="act_pos">
+              <type>
+                <LREAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> Actual position to log</xhtml>
+              </documentation>
+            </variable>
+            <variable name="act_vel">
+              <type>
+                <LREAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> Actual velocity to log</xhtml>
+              </documentation>
+            </variable>
+            <variable name="act_torque">
+              <type>
+                <LREAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> Actual torque to log</xhtml>
+              </documentation>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="bDone">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> Set TRUE when file is successfully closed</xhtml>
+              </documentation>
+            </variable>
+            <variable name="bBusy">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> Indicates if file operation is in progress</xhtml>
+              </documentation>
+            </variable>
+            <variable name="bError">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> Set TRUE on any error</xhtml>
+              </documentation>
+            </variable>
+            <variable name="nErrorId">
+              <type>
+                <UDINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> TwinCAT file function error code</xhtml>
+              </documentation>
+            </variable>
+            <variable name="hFile">
+              <type>
+                <UINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> File handle (used for writing/closing)</xhtml>
+              </documentation>
+            </variable>
+          </outputVars>
+          <localVars>
+            <variable name="dataBuffer">
+              <type>
+                <array>
+                  <dimension lower="1" upper="4" />
+                  <baseType>
+                    <LREAL />
+                  </baseType>
+                </array>
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> Buffer for logging data</xhtml>
+              </documentation>
+            </variable>
+            <variable name="nBytesToWrite">
+              <type>
+                <UDINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> Number of bytes to write</xhtml>
+              </documentation>
+            </variable>
+            <variable name="fbFileOpen">
+              <type>
+                <derived name="FB_FileOpen" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> File open function block</xhtml>
+              </documentation>
+            </variable>
+            <variable name="fbFileWrite">
+              <type>
+                <derived name="FB_FileWrite" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> File write function block</xhtml>
+              </documentation>
+            </variable>
+            <variable name="fbFileClose">
+              <type>
+                <derived name="FB_FileClose" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> File close function block</xhtml>
+              </documentation>
+            </variable>
+            <variable name="bFileOpen">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="TRUE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> Internal flag for open execution control</xhtml>
+              </documentation>
+            </variable>
+          </localVars>
+        </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">(*
+------------------------------------------------------------------------------
+FB_DataLogger - Binary Data Logger Function Block
+
+DESCRIPTION:
+This function block logs a set of numerical values (e.g., timestamp, position,
+velocity, torque) into a binary file. It is suitable for real-time signal logging
+during experiments, simulations, or runtime testing.
+
+FEATURES:
+- Handles file opening, writing, and closing internally
+- Binary file format using an LREAL array
+- 5-second timeout protection for each file operation
+- Outputs useful status flags for diagnostics and visualization
+- File handle exposed for integration with other blocks
+
+INPUTS:
+- netId      : T_AmsNetId  → Network ID (use '' for local)
+- sFileName  : T_MaxString → Full path to the file to open/write
+- bOpen      : BOOL        → Trigger to open the file
+- bWrite     : BOOL        → Trigger to write a data sample
+- bClose     : BOOL        → Trigger to close the file
+- t          : LREAL       → Time value to log
+- act_pos    : LREAL       → Position value to log
+- act_vel    : LREAL       → Velocity value to log
+- act_torque : LREAL       → Torque value to log
+
+OUTPUTS:
+- bDone      : BOOL    → TRUE when file closed successfully
+- bBusy      : BOOL    → TRUE when file close is ongoing
+- bError     : BOOL    → TRUE if any file operation fails
+- nErrorId   : UDINT   → Error code from TwinCAT file functions
+- hFile      : UINT    → File handle currently in use
+
+USAGE:
+Call this block cyclically. Use rising edge triggers for bOpen, bWrite, and bClose.
+Data is written in binary format using `ARRAY[1..4] OF LREAL`. Suitable for analysis
+with external tools or for real-time streaming to memory buffers.
+
+VERSION:
+v1.0 - March 2025
+
+AUTHOR:
+Manuel Beschi cari.unibs.it
+
+------------------------------------------------------------------------------
+*)
+
+// === Step 1: Open File ===
+IF bOpen THEN
+    // Perform a two-step execution to latch rising edge for file open
+    fbFileOpen(
+        sPathName := sFileName,
+        nMode     := FOPEN_MODEWRITE OR FOPEN_MODEBINARY, // Overwrites if exists
+        sNetId    := netId,
+        bExecute  := FALSE,
+        tTimeout  := T#5S // 5 seconds timeout
+    );
+    fbFileOpen(
+        sPathName := sFileName,
+        nMode     := FOPEN_MODEWRITE OR FOPEN_MODEBINARY,
+        sNetId    := netId,
+        bExecute  := TRUE,
+        tTimeout  := T#5S // 5 seconds timeout
+    );
+
+    // Check file open result
+    IF NOT fbFileOpen.bBusy THEN
+        IF NOT fbFileOpen.bError THEN
+            hFile := fbFileOpen.hFile;
+            bOpen := FALSE; // Reset trigger
+        ELSE
+            bError := TRUE;
+            nErrorId := fbFileOpen.nErrId;
+        END_IF
+    END_IF
+END_IF
+
+// Safety check if open is still busy (extra safe check)
+IF fbFileOpen.bBusy THEN
+    fbFileOpen(); // Call again to keep evaluating
+    IF NOT fbFileOpen.bError THEN
+        hFile := fbFileOpen.hFile;
+        bOpen := FALSE;
+    ELSE
+        bError := TRUE;
+        nErrorId := fbFileOpen.nErrId;
+    END_IF
+END_IF
+
+// === Step 2: Write Data ===
+IF bWrite AND (NOT fbFileOpen.bBusy) THEN
+    // Prepare data buffer with current inputs
+    dataBuffer[1] := t;
+    dataBuffer[2] := act_pos;
+    dataBuffer[3] := act_vel;
+    dataBuffer[4] := act_torque;
+
+    nBytesToWrite := SIZEOF(dataBuffer); // Size in bytes
+
+    // Do a two-step write with rising edge simulation
+    fbFileWrite(
+        sNetId      := netId,
+        hFile       := hFile,
+        pWriteBuff  := ADR(dataBuffer),
+        cbWriteLen  := nBytesToWrite,
+        bExecute    := FALSE
+    );
+    fbFileWrite(
+        sNetId      := netId,
+        hFile       := hFile,
+        pWriteBuff  := ADR(dataBuffer),
+        cbWriteLen  := nBytesToWrite,
+        bExecute    := TRUE
+    );
+END_IF
+
+// === Step 3: Close File ===
+IF bClose THEN
+    fbFileClose.bExecute := FALSE; // Rising edge handling
+
+    // Execute close operation
+    fbFileClose(
+        hFile     := hFile,
+        bExecute  := TRUE,
+        tTimeout  := T#5S
+    );
+
+    // Output states
+    bBusy := fbFileClose.bBusy;
+    bError := fbFileClose.bError;
+    nErrorId := fbFileClose.nErrId;
+
+    // Check if closed successfully
+    IF NOT fbFileClose.bBusy THEN
+        IF NOT fbFileClose.bError THEN
+            bClose := FALSE;
+            bDone := TRUE;
+            hFile := 0; // Invalidate handle
+        END_IF
+    END_IF
+ELSE
+    bDone := FALSE; // Clear done when not closing
+END_IF
+
+</xhtml>
+          </ST>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/interfaceasplaintext" handleUnknown="implementation">
+            <InterfaceAsPlainText>
+              <xhtml xmlns="http://www.w3.org/1999/xhtml">FUNCTION_BLOCK FB_DataLogger
+VAR_INPUT
+    netId       : T_AmsNetId;        // TwinCAT network ID (e.g., '')
+    sFileName   : T_MaxString;       // File path and name (e.g., 'C:\Logs\data.bin')
+    bOpen       : BOOL;              // Rising edge to trigger file open
+    bWrite      : BOOL;              // Rising edge to trigger data write
+    bClose      : BOOL;              // Rising edge to trigger file close
+    t           : LREAL;             // Timestamp or simulation time
+    act_pos     : LREAL;             // Actual position to log
+    act_vel     : LREAL;             // Actual velocity to log
+    act_torque  : LREAL;             // Actual torque to log
+END_VAR
+VAR_OUTPUT
+    bDone       : BOOL;              // Set TRUE when file is successfully closed
+    bBusy       : BOOL;              // Indicates if file operation is in progress
+    bError      : BOOL;              // Set TRUE on any error
+    nErrorId    : UDINT;             // TwinCAT file function error code
+    hFile       : UINT;              // File handle (used for writing/closing)
+END_VAR
+VAR
+    dataBuffer     : ARRAY[1..4] OF LREAL;  // Buffer for logging data
+    nBytesToWrite  : UDINT;                 // Number of bytes to write
+    fbFileOpen     : FB_FileOpen;           // File open function block
+    fbFileWrite    : FB_FileWrite;          // File write function block
+    fbFileClose    : FB_FileClose;          // File close function block
+    bFileOpen      : BOOL := TRUE;          // Internal flag for open execution control
+END_VAR
+
+VAR_TEMP
+	
+END_VAR</xhtml>
+            </InterfaceAsPlainText>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>3bd8a5df-1906-462a-97d8-187cdf922de2</ObjectId>
+          </data>
+        </addData>
+      </pou>
+    </pous>
+  </types>
+  <instances>
+    <configurations />
+  </instances>
+  <addData>
+    <data name="http://www.3s-software.com/plcopenxml/projectstructure" handleUnknown="discard">
+      <ProjectStructure>
+        <Object Name="FB_DataLogger" ObjectId="3bd8a5df-1906-462a-97d8-187cdf922de2" />
+      </ProjectStructure>
+    </data>
+  </addData>
+</project>

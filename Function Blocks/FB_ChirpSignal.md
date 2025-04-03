@@ -143,4 +143,4 @@ fbChirp(
 **Manuel Beschi**  
 Joint Robotics Lab (JRL) - CARI  
 University of Brescia  
-📧 manuel.beschi@unibs.it
+cari.unibs.it
