@@ -11,12 +11,17 @@ This repository is maintained by the Robotics Joint Research Lab (JRL) between S
   - [`SimpleExampleMC2`](Programs/SimpleExampleMC2.md) – An illustrative example of the Tc2_MC2 Motion Control library
   - [`ChirpTest`](Programs/ChirpTest.md) – A complete motion experiment using chirp excitation and real-time logging.
 
+__XXX.xml__ is the only program.
+__XXX_FullPlcProject.xml__ is the entire PLC projects (PROGRAM, FB, DUTs, ...).
+
+
 - **[Function Blocks](Function%20Blocks/)**  
   - [`FB_ChirpSignal`](Function%20Blocks/FB_ChirpSignal.md) – Generates linear or logarithmic chirp trajectories with optional acceleration and velocity modes.
   - [`FB_DataLogger`](Function%20Blocks/FB_DataLogger.md) – Binary logger.
   
 - **[Derived User Types (DUTs)](DUTs/)**  
   - [`E_State (ChirpTest)`](DUTs/ChirpTaskE_State.xml) – Enumerator used in `ChirpTest`.
+  - [`SimpleExampleMC2_MotorState (SimpleExampleMC2)`](DUTs/SimpleExampleMC2_MotorState.xml) – Enumerator used in `SimpleExampleMC2`.
 
 ---
 
