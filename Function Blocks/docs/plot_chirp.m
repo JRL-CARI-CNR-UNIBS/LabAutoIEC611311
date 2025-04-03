@@ -48,7 +48,7 @@ xlabel('Time [s]');
 ylabel('Acceleration [units/s^2]');
 
 % Export figure to high-res transparent PNG
-export_fig chirp_position.png -r 300 -transparent
+export_fig chirp_position.png -r 300 
 
 %% Plot 2: Chirp as Velocity Input
 figure;
@@ -72,7 +72,7 @@ grid on;
 xlabel('Time [s]');
 ylabel('Acceleration [units/s^2]');
 
-export_fig chirp_velocity.png -r 300 -transparent
+export_fig chirp_velocity.png -r 300 
 
 %% Plot 3: Chirp as Acceleration Input
 figure;
@@ -96,4 +96,4 @@ grid on;
 xlabel('Time [s]');
 ylabel('Acceleration [units/s^2]');
 
-export_fig chirp_acceleration.png -r 300 -transparent
+export_fig chirp_acceleration.png -r 300
